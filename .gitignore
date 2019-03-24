@@ -82,3 +82,6 @@ dist
 
 # Service worker
 sw.*
+
+# config file
+circla.config.js
