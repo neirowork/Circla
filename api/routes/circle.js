@@ -26,7 +26,6 @@ router.post(
   ],
   (req, res) => {
     const validationErrors = validationResult(req).array()
-    console.log(validationErrors)
     if (validationErrors.length !== 0) {
       return res.status(422).json({ errors: validationErrors })
     }
