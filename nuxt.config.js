@@ -4,7 +4,7 @@ export default {
   mode: 'spa',
 
   srcDir: './client/',
-  serverMiddleware: ['~~/api/'],
+  serverMiddleware: ['~~/api'],
 
   /*
    ** Headers of the page
