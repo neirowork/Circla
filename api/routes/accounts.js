@@ -50,7 +50,7 @@ router.post(
  * [POST] /accounts/jwt
  */
 router.post(
-  '/',
+  '/jwt',
   [
     check('loginId')
       .isAlphanumeric()
@@ -73,7 +73,10 @@ router.post(
         displayName: '染宮ねいろ',
         scope: 'USER'
       },
-      circlaConfig.jwt.key
+      circlaConfig.jwt.key,
+      {
+        expiresIn: '1d'
+      }
     )
 
     return res.json({

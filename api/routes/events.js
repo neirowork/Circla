@@ -3,11 +3,18 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
+import jwtMiddleware from '../libs/jwtMiddleware'
+
 import errorResponse from '../assets/errors'
 import * as eventsModule from '../libs/events'
 
 /**
- * 申込み一覧
+ * ここから下 認証必要ルート
+ */
+router.use((req, res, next) => jwtMiddleware(req, res, next))
+
+/**
+ * 🔒(ADMIN) 申込み一覧
  * [GET] /events/:eventId/applications
  */
 router.get(
@@ -19,6 +26,10 @@ router.get(
       .isEmpty()
   ],
   (req, res) => {
+    if (token.scope !== 'ADMIN') {
+      return res.status(403).json(errorResponse.forbidden)
+    }
+
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
@@ -57,7 +68,7 @@ router.get(
 )
 
 /**
- * 仮申込み
+ * 🔒(USER) 仮申込み
  * [POST] /events/:eventId/applications
  */
 router.post(

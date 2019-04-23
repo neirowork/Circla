@@ -3,10 +3,17 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
+import jwtMiddleware from '../libs/jwtMiddleware'
+
 import errorResponse from '../assets/errors'
 
 /**
- * 個人情報の追加
+ * ここから下 認証必要ルート
+ */
+router.use((req, res, next) => jwtMiddleware(req, res, next))
+
+/**
+ * 🔒(USER) 個人情報の追加
  * [POST] /personal-info
  */
 router.post(
