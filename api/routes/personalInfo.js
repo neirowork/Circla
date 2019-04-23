@@ -41,4 +41,41 @@ router.post(
   }
 )
 
+/**
+ * 🔒(ADMIN) 個人情報の追加(運営用)
+ * [POST] /personal-info/:circleId
+ */
+router.post(
+  '/:circleId',
+  [
+    check('circleId')
+      .isString()
+      .not()
+      .isEmpty(),
+    check('name')
+      .isString()
+      .not()
+      .isEmpty(),
+    check('postalCode')
+      .isString()
+      .not()
+      .isEmpty(),
+    check('address')
+      .isString()
+      .not()
+      .isEmpty()
+  ],
+  (req, res) => {
+    if (req.token.scope !== 'ADMIN') {
+      return res.status(403).json(errorResponse.forbidden)
+    }
+
+    const errors = validationResult(req).array()
+    if (errors.length)
+      return res.status(422).json(errorResponse.validation(errors))
+
+    return res.status(200)
+  }
+)
+
 export default router

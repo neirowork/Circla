@@ -13,6 +13,34 @@ import * as eventsModule from '../libs/events'
  */
 router.use((req, res, next) => jwtMiddleware(req, res, next))
 
+router.get('/', (req, res) => {
+  return res.json({
+    applications: {
+      'myfes2019-1555952581-0918': {
+        circleId: '1234567891234567890abcdef1234567890abcdef',
+        paymoId: 'U-1145141919810',
+        circleName: 'ジーセカンド',
+        general: {
+          genreCode: '114',
+          overview: '1',
+          amount: '514'
+        },
+        congruence: {
+          anotherPaymoId: 'U-1145141919810',
+          anotherCircleId: '1919810'
+        },
+        remarks: '114514',
+        status: 'APPLICATIONS_COMPLETED',
+        timestamp: '1145141919810',
+        space: {
+          block: '草',
+          number: '15'
+        }
+      }
+    }
+  })
+})
+
 /**
  * 🔒(ADMIN) 申込みを有効化する
  * [PATCH] /applications/:applicationCode/valid
