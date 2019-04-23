@@ -1,6 +1,12 @@
 /**
+ * 個人情報が入力されているかどうかの確認
+ * @param {string} accountId 内部ID
+ */
+const exist = accountId => new Promise((resolve, reject) => {})
+
+/**
  * 個人情報の追加
- * @param {*} accountId 内部ID
+ * @param {string} accountId 内部ID
  * @returns {boolean} 追加ステータス
  */
 const add = accountId =>
@@ -10,8 +16,8 @@ const add = accountId =>
 
 /**
  * 個人情報の更新
- * @param {*} accountId 内部ID
- * @param {*} data 個人情報
+ * @param {string} accountId 内部ID
+ * @param {object} data 個人情報
  * @returns {boolean} 更新ステータス
  */
 const update = (accountId, data) =>
