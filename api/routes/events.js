@@ -39,30 +39,10 @@ router.get(
     if (!eventsModule.existEvent(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
+    // const applications = await eventModule.getApplications(eventId)
+
     return res.json({
-      applications: {
-        'myfes2019-1555952581-0918': {
-          circleId: '1234567891234567890abcdef1234567890abcdef',
-          paymoId: 'U-1145141919810',
-          circleName: 'ジーセカンド',
-          general: {
-            genreCode: '114',
-            overview: '1',
-            amount: '514'
-          },
-          congruence: {
-            anotherPaymoId: 'U-1145141919810',
-            anotherCircleId: '1919810'
-          },
-          remarks: '114514',
-          status: 'APPLICATIONS_COMPLETED',
-          timestamp: '1145141919810',
-          space: {
-            block: '草',
-            number: '15'
-          }
-        }
-      }
+      applications: {}
     })
   }
 )
@@ -120,6 +100,8 @@ router.post(
 
     if (!eventsModule.existEvent(eventId))
       return res.status(404).json(errorResponse.event.notFound)
+
+    // const applicationCode = applicationsModule.createApplication(eventId, paymoId, circleName, generalInfos, congruenceInfos)
 
     const now = new Date()
     const applicationCode = `${eventId}-${Math.floor(now.getTime() / 1000)}-${(

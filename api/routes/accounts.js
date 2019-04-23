@@ -17,7 +17,7 @@ import errorResponse from '../assets/errors'
 router.post(
   '/',
   [
-    check('mailAddress')
+    check('emailAddress')
       .isEmail()
       .normalizeEmail()
       .not()
@@ -26,7 +26,7 @@ router.post(
       .isAlphanumeric()
       .not()
       .isEmpty(),
-    check('password')
+    check('passwordHash')
       .isString()
       .not()
       .isEmpty(),
@@ -35,14 +35,15 @@ router.post(
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  /* async */ (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
-    return res.json({
-      circleId: '114514'
-    })
+    // const circleId = await accountModule.createTempAccount(emailAddress)
+    // const writeStatus = await accountModule.writeData(circleId, loginId, passwordHash, displayName)
+
+    return res.status(200)
   }
 )
 
@@ -57,20 +58,24 @@ router.post(
       .isAlphanumeric()
       .not()
       .isEmpty(),
-    check('password')
+    check('passwordHash')
       .isString()
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  /* async */ (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
+    // const accountData = await accountModule.authAccount(loginId, passwordHash).catch(err => {
+    // return res.status(403).json({message: 'アカウントが見つかりませんでした。'})
+    // })
+
     const token = jwt.sign(
       {
         circleId: '1234567890abcdef',
-        gravatarId: '1145141919810',
+        emailAddress: '1145141919810',
         displayName: '染宮ねいろ',
         scope: 'ADMIN'
       },
@@ -87,51 +92,6 @@ router.post(
 )
 
 /**
- * 認証コードから登録情報取得
- * [POST] /accounts/temp/:circleId/auth/:authCode
- */
-router.post('/temp/:circleId/auth/:authCode', (req, res) => {
-  return res.status({
-    mailAddress: 'nirot1r@g-second.net'
-  })
-})
-
-/**
- * 認証コードを使用してサークル情報書き込み
- * [POST] /accounts/temp/:circleId/auth/:authCode
- */
-router.post(
-  '/temp/:circleId/auth/:authCode',
-  [
-    check('loginId')
-      .isAlphanumeric()
-      .not()
-      .isEmpty(),
-    check('password')
-      .isString()
-      .not()
-      .isEmpty(),
-    check('displayName')
-      .isString()
-      .not()
-      .isEmpty()
-  ],
-  (req, res) => {
-    return res.json({
-      circleId: '114514'
-    })
-  }
-)
-
-/**
- * 認証コードを無効化
- * [DELETE] /accounts/temp/:circleId/auth/:authCode
- */
-router.delete('/temp/:circleId/auth/:authCode', (req, res) => {
-  return res.status(200)
-})
-
-/**
  * ここから下 認証必要ルート
  */
 router.use((req, res, next) => jwtMiddleware(req, res, next))
@@ -143,13 +103,13 @@ router.use((req, res, next) => jwtMiddleware(req, res, next))
 router.post(
   '/temp',
   [
-    check('mailAddress')
+    check('emailAddress')
       .isEmail()
       .normalizeEmail()
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  /* async */ (req, res) => {
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
@@ -157,6 +117,10 @@ router.post(
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+
+    // const circleId = await accountModule.createTempAccount(emailAddress).catch(err => {
+    // return res.status(409).json({message: 'メールアドレス・ログインIDが既に存在しています。'})
+    // })
 
     return res.json({
       circleId: '114514'
@@ -168,14 +132,19 @@ router.post(
  * 🔒(ADMIN) 認証コード送信
  * [POST] /accounts/temp/:circleId/auth
  */
-router.post('/temp/:circleId/auth', (req, res) => {
-  if (req.token.scope !== 'ADMIN') {
-    return res.status(403).json(errorResponse.forbidden)
-  }
+router.post(
+  '/temp/:circleId/auth',
+  /* async */ (req, res) => {
+    if (req.token.scope !== 'ADMIN') {
+      return res.status(403).json(errorResponse.forbidden)
+    }
 
-  return res.json({
-    code: '認証コード'
-  })
-})
+    // const authCode = await authModule.createAuthCode(circleId)
+
+    return res.json({
+      code: '認証コード'
+    })
+  }
+)
 
 export default router

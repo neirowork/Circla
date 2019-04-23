@@ -13,31 +13,15 @@ import * as eventsModule from '../libs/events'
  */
 router.use((req, res, next) => jwtMiddleware(req, res, next))
 
+/**
+ * 🔒(USER) 自分が申し込んだイベント一覧
+ * [GET] /applications
+ */
 router.get('/', (req, res) => {
+  // const applications = await applicationsModule.getApplications(circleId)
+
   return res.json({
-    applications: {
-      'myfes2019-1555952581-0918': {
-        circleId: '1234567891234567890abcdef1234567890abcdef',
-        paymoId: 'U-1145141919810',
-        circleName: 'ジーセカンド',
-        general: {
-          genreCode: '114',
-          overview: '1',
-          amount: '514'
-        },
-        congruence: {
-          anotherPaymoId: 'U-1145141919810',
-          anotherCircleId: '1919810'
-        },
-        remarks: '114514',
-        status: 'APPLICATIONS_COMPLETED',
-        timestamp: '1145141919810',
-        space: {
-          block: '草',
-          number: '15'
-        }
-      }
-    }
+    applications: {}
   })
 })
 
@@ -65,13 +49,12 @@ router.patch(
     const code = req.params.applicationCode
     const eventId = code.match(/^(.*)-(.*)-(.*)$/)[1]
 
+    // const vaildStatus = applicationsModule.vaildApplication(applicationCode)
+
     if (!eventsModule.existEvent(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    return res.json({
-      code,
-      status: 'APPLICATIONS_COMPLETED'
-    })
+    return res.status(200)
   }
 )
 

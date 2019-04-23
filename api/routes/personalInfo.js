@@ -37,6 +37,8 @@ router.post(
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
+    // const addStatus = personalInfoModule.addPersonalInfo(circleId, name, postalCode, address)
+
     return res.status(200)
   }
 )
@@ -73,6 +75,8 @@ router.post(
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+
+    // const addStatus = personalInfoModule.addPersonalInfo(circleId, name, postalCode, address)
 
     return res.status(200)
   }
