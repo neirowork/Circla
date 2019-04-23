@@ -2,7 +2,10 @@
  * 個人情報が入力されているかどうかの確認
  * @param {string} accountId 内部ID
  */
-const exist = accountId => new Promise((resolve, reject) => {})
+const exist = accountId =>
+  new Promise((resolve, reject) => {
+    return resolve(true)
+  })
 
 /**
  * 個人情報の追加

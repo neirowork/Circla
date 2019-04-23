@@ -15,7 +15,7 @@ const exist = (emailAddress = '', loginId = '') => {
  */
 const createTempAccount = emailAddress =>
   new Promise((resolve, reject) => {
-    if (exist(emailAddress)) {
+    if (this.exist(emailAddress)) {
       return reject('メールアドレスが既に存在しています。')
     }
 
@@ -32,6 +32,9 @@ const createTempAccount = emailAddress =>
  */
 const update = (accountId, loginId, passwordHash, displayName) =>
   new Promise((resolve, reject) => {
+    if (this.exist(null, loginId)) {
+      return reject('ログインIDが既に存在しています。')
+    }
     return resolve(true)
   })
 
