@@ -71,7 +71,7 @@ router.post(
         circleId: '1234567890abcdef',
         gravatarId: '1145141919810',
         displayName: '染宮ねいろ',
-        scope: 'USER'
+        scope: 'ADMIN'
       },
       circlaConfig.jwt.key,
       {

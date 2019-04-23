@@ -26,7 +26,7 @@ router.get(
       .isEmpty()
   ],
   (req, res) => {
-    if (token.scope !== 'ADMIN') {
+    if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
 
