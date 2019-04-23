@@ -14,7 +14,11 @@ const add = accountId =>
  * @param {*} data 個人情報
  * @returns {boolean} 更新ステータス
  */
-export const update = (accountId, data) =>
+const update = (accountId, data) =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
+
+export default {
+  update
+}

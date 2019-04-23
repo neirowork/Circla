@@ -3,7 +3,9 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
-import jwtMiddleware from '../libs/jwtMiddleware'
+import jwtMiddleware from '../middlewares/jwt'
+
+import personalInfos from '../libs/personalInfo'
 
 import errorResponse from '../assets/errors'
 
@@ -19,27 +21,29 @@ router.use((req, res, next) => jwtMiddleware(req, res, next))
 router.post(
   '/',
   [
-    check('name')
+    check('data.name')
       .isString()
       .not()
       .isEmpty(),
-    check('postalCode')
+    check('data.postalCode')
       .isString()
       .not()
       .isEmpty(),
-    check('address')
+    check('data.address')
       .isString()
       .not()
       .isEmpty()
   ],
   (req, res) => {
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    // const addStatus = personalInfoModule.addPersonalInfo(circleId, name, postalCode, address)
+    personalInfos.update(req.token.accountId, req.body.data)
 
-    return res.status(200)
+    return res.status(200).json({ status: true })
   }
 )
 
@@ -54,31 +58,34 @@ router.post(
       .isString()
       .not()
       .isEmpty(),
-    check('name')
+    check('data.name')
       .isString()
       .not()
       .isEmpty(),
-    check('postalCode')
+    check('data.postalCode')
       .isString()
       .not()
       .isEmpty(),
-    check('address')
+    check('data.address')
       .isString()
       .not()
       .isEmpty()
   ],
   (req, res) => {
+    // 管理者以外は通さない
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
 
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    // const addStatus = personalInfoModule.addPersonalInfo(circleId, name, postalCode, address)
+    personalInfos.update(req.params.accountId, req.body.data)
 
-    return res.status(200)
+    return res.status(200).json({ status: true })
   }
 )
 

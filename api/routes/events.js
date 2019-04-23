@@ -3,7 +3,10 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
-import jwtMiddleware from '../libs/jwtMiddleware'
+import jwtMiddleware from '../middlewares/jwt'
+
+import events from '../libs/events'
+import applications from '../libs/applications'
 
 import errorResponse from '../assets/errors'
 import * as eventsModule from '../libs/events'
@@ -25,24 +28,27 @@ router.get(
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  async (req, res) => {
+    // 管理者以外は通さない
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
 
+    const eventId = req.params.eventId
+
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    const eventId = req.params.eventId
-
-    if (!eventsModule.existEvent(eventId))
+    if (!events.get(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    // const applications = await eventModule.getApplications(eventId)
+    const apps = await events.getApplications(eventId)
 
     return res.json({
-      applications: {}
+      applications: apps
     })
   }
 )
@@ -82,41 +88,35 @@ router.post(
       .isString()
       .not()
       .isEmpty(),
-    check('congruence.circleId')
+    check('congruence.accountId')
       .isString()
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  async (req, res) => {
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
     const eventId = req.params.eventId
-    const paymoId = req.body.paymoId
-    const circleName = req.body.circleName
-    const general = req.body.general
-    const congruence = req.body.congruence
+    const body = req.body
 
-    if (!eventsModule.existEvent(eventId))
+    if (!events.get(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    // const applicationCode = applicationsModule.createApplication(eventId, paymoId, circleName, generalInfos, congruenceInfos)
-
-    const now = new Date()
-    const applicationCode = `${eventId}-${Math.floor(now.getTime() / 1000)}-${(
-      '0000' + Math.floor(Math.random() * 1000)
-    ).slice(-4)}`
+    const applicationId = await applications.create(
+      req.token.accountId,
+      eventId,
+      body.paymoId,
+      body.circleName,
+      body.general,
+      body.congruence
+    )
 
     return res.json({
-      code: applicationCode,
-      data: {
-        paymoId,
-        circleName,
-        general,
-        congruence,
-        timestamp: Math.floor(now.getTime() / 1000)
-      }
+      applicationId
     })
   }
 )

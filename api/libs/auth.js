@@ -3,7 +3,7 @@
  * @param {string} accountId 内部ID
  * @returns {string} 認証トークン
  */
-export const createToken = accountId =>
+const createToken = accountId =>
   new Promise((resolve, reject) => {
     return resolve('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
   })
@@ -13,7 +13,7 @@ export const createToken = accountId =>
  * @param {string} authToken 認証トークン
  * @returns {Promise} アカウント情報
  */
-export const getCircle = authToken =>
+const getCircle = authToken =>
   new Promise((resolve, reject) => {
     // if(DB) {
     //   return reject('アカウントが見つかりませんでした。')
@@ -33,7 +33,13 @@ export const getCircle = authToken =>
  * @param {string} authToken 認証トークン
  * @returns {Promise} 無効化ステータス
  */
-export const invokeCode = authToken =>
+const invoke = authToken =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
+
+export default {
+  createToken,
+  getCircle,
+  invoke
+}

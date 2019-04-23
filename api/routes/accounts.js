@@ -6,9 +6,12 @@ const router = express.Router()
 import circlaConfig from '../../circla.config'
 
 import jwt from 'jsonwebtoken'
-import jwtMiddleware from '../libs/jwtMiddleware'
+import jwtMiddleware from '../middlewares/jwt'
 
 import errorResponse from '../assets/errors'
+
+import accounts from '../libs/accounts'
+import auth from '../libs/auth'
 
 /**
  * アカウントの作成
@@ -35,15 +38,35 @@ router.post(
       .not()
       .isEmpty()
   ],
-  /* async */ (req, res) => {
+  async (req, res) => {
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    // const circleId = await accountModule.createTempAccount(emailAddress)
-    // const writeStatus = await accountModule.writeData(circleId, loginId, passwordHash, displayName)
+    const body = req.body
+    const accountId = await accounts
+      .createTempAccount(req.body.emailAddress)
+      .catch(err => {
+        if (err) {
+          return res
+            .status(409)
+            .json({ message: 'そのメールアドレスは既に存在しています。' })
+        }
+      })
 
-    return res.status(200)
+    await accounts
+      .update(accountId, body.loginId, body.passwordHash, body.displayName)
+      .catch(err => {
+        if (err) {
+          return res.status(404).json({ message: '内部IDが見つかりません' })
+        }
+      })
+
+    return res.status(200).json({
+      status: true
+    })
   }
 )
 
@@ -63,30 +86,28 @@ router.post(
       .not()
       .isEmpty()
   ],
-  /* async */ (req, res) => {
+  async (req, res) => {
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    // const accountData = await accountModule.authAccount(loginId, passwordHash).catch(err => {
-    // return res.status(403).json({message: 'アカウントが見つかりませんでした。'})
-    // })
+    const body = req.body
+    const account = await accounts
+      .auth(body.loginId, body.passwordHash)
+      .catch(err => {
+        if (err) {
+          return res.status(403).json({ message: '認証に失敗しました。' })
+        }
+      })
 
-    const token = jwt.sign(
-      {
-        circleId: '1234567890abcdef',
-        emailAddress: '1145141919810',
-        displayName: '染宮ねいろ',
-        scope: 'ADMIN'
-      },
-      circlaConfig.jwt.key,
-      {
-        expiresIn: '1d'
-      }
-    )
+    const jwtToken = jwt.sign(account, circlaConfig.jwt.key, {
+      expiresIn: '1d'
+    })
 
     return res.json({
-      token
+      token: jwtToken
     })
   }
 )
@@ -109,40 +130,62 @@ router.post(
       .not()
       .isEmpty()
   ],
-  /* async */ (req, res) => {
+  async (req, res) => {
+    // 管理者以外は通さない
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
 
+    // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
 
-    // const circleId = await accountModule.createTempAccount(emailAddress).catch(err => {
-    // return res.status(409).json({message: 'メールアドレス・ログインIDが既に存在しています。'})
-    // })
+    const accountId = await accounts
+      .createTempAccount(req.body.emailAddress)
+      .catch(err => {
+        if (err) {
+          return res
+            .status(409)
+            .json({ message: 'そのメールアドレスは既に存在しています。' })
+        }
+      })
 
     return res.json({
-      circleId: '114514'
+      accountId
     })
   }
 )
 
 /**
  * 🔒(ADMIN) 認証コード送信
- * [POST] /accounts/temp/:circleId/auth
+ * [POST] /accounts/temp/:accountId/auth
  */
 router.post(
-  '/temp/:circleId/auth',
-  /* async */ (req, res) => {
+  '/temp/:accountId/auth',
+  [
+    check('accountId')
+      .isString()
+      .not()
+      .isEmpty()
+  ],
+  async (req, res) => {
+    // 管理者以外は通さない
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
     }
 
-    // const authCode = await authModule.createAuthCode(circleId)
+    // #region バリデーション
+    const errors = validationResult(req).array()
+    if (errors.length)
+      return res.status(422).json(errorResponse.validation(errors))
+    // #endregion
+
+    const authToken = await auth.createToken(req.params.accountId)
 
     return res.json({
-      code: '認証コード'
+      authToken
     })
   }
 )

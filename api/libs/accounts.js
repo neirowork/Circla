@@ -4,8 +4,8 @@
  * @param {string} mailAddress
  * @param {string} loginId
  */
-const exist = (mailAddress = '', loginId = '') => {
-  return true
+const exist = (emailAddress = '', loginId = '') => {
+  return false
 }
 
 /**
@@ -13,9 +13,9 @@ const exist = (mailAddress = '', loginId = '') => {
  * @param {string} emailAddress メールアドレス
  * @return {Promise} 内部ID
  */
-export const createTempAccount = emailAddress =>
+const createTempAccount = emailAddress =>
   new Promise((resolve, reject) => {
-    if (exist(mailAddress)) {
+    if (exist(emailAddress)) {
       return reject('メールアドレスが既に存在しています。')
     }
 
@@ -30,7 +30,7 @@ export const createTempAccount = emailAddress =>
  * @param {string} displayName 表示名
  * @returns {Promise} 更新ステータス
  */
-export const update = (accountId, loginId, passwordHash, displayName) =>
+const update = (accountId, loginId, passwordHash, displayName) =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
@@ -41,7 +41,7 @@ export const update = (accountId, loginId, passwordHash, displayName) =>
  * @param {string} passwordHash
  * @return {Promise} アカウント情報
  */
-export const auth = (loginId, passwordHash) =>
+const auth = (loginId, passwordHash) =>
   new Promise((resolve, reject) => {
     // if(DB) {
     //   return reject('アカウントが見つかりませんでした。')
@@ -52,7 +52,7 @@ export const auth = (loginId, passwordHash) =>
       gravatarId: 'xxxxxxxxxxxxxxxx',
       emailAddress: 'example@example.com',
       displayName: '舞宮蔵子',
-      scope: 'USER'
+      scope: 'ADMIN'
     })
   })
 
@@ -61,7 +61,7 @@ export const auth = (loginId, passwordHash) =>
  * @param {string} accountId 内部ID
  * @returns {Promise} 申込みデータ
  */
-export const getApplications = accountId =>
+const getApplications = accountId =>
   new Promise((resolve, reject) => {
     return resolve({
       'xxxxxxxxxx-xxxxxxxxxx-xxxx': {
@@ -87,3 +87,10 @@ export const getApplications = accountId =>
       }
     })
   })
+
+export default {
+  createTempAccount,
+  update,
+  auth,
+  getApplications
+}

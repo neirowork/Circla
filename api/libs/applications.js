@@ -8,7 +8,7 @@
  * @param {object} congruenceInfos 合体申込み情報
  * @returns {Promise} 申込みID
  */
-export const create = (
+const create = (
   accountId,
   eventId,
   paymoId,
@@ -17,6 +17,11 @@ export const create = (
   congruenceInfos
 ) =>
   new Promise((resolve, reject) => {
+    // const now = new Date()
+    // const applicationCode = `${eventId}-${Math.floor(now.getTime() / 1000)}-${(
+    //   '0000' + Math.floor(Math.random() * 1000)
+    // ).slice(-4)}`
+
     return resolve('xxxxxxxxxx-xxxxxxxxxx-xxxx')
   })
 
@@ -25,7 +30,12 @@ export const create = (
  * @param {string} applicationID 申込みID
  * @returns {Promise} 有効化ステータス
  */
-export const vaildApplication = applicationID =>
+const vaild = applicationID =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
+
+export default {
+  create,
+  vaild
+}

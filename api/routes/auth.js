@@ -3,38 +3,59 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
+import auth from '../libs/auth'
+import accounts from '../libs/accounts'
+
 import errorResponse from '../assets/errors'
 
 /**
- * 認証コードを無効化
- * [DELETE] /auth/:authCode
+ * 認証トークンを無効化
+ * [DELETE] /auth/:authToken
  */
-router.delete('/auth/:authCode', (req, res) => {
-  // const invokeStatus = await authModule.invokeCode(authCode)
-  return res.status(200)
-})
+router.delete(
+  '/:authToken',
+  [
+    check('authToken')
+      .isString()
+      .not()
+      .isEmpty()
+  ],
+  (req, res) => {
+    auth.invoke(req.params.authToken)
 
-/**
- * 認証コードから登録情報取得
- * [GET] /auth/:authCode/accounts
- */
-router.get(
-  '/auth/:authCode/accounts',
-  /* async */ (req, res) => {
-    // const account = await authModule.getCircle(authCode)
-    return res.status({
-      emailAddress: 'nirot1r@g-second.net'
-    })
+    return res.status(200).json({ status: true })
   }
 )
 
 /**
- * 認証コードを使用してサークル情報書き込み
- * [POST] /auth/:authCode/accounts
+ * 認証トークンから登録情報取得
+ * [GET] /auth/:authToken/accounts
+ */
+router.get(
+  '/:authToken/accounts',
+  [
+    check('authToken')
+      .isString()
+      .not()
+      .isEmpty()
+  ],
+  async (req, res) => {
+    const account = await auth.getCircle(req.params.authToken)
+    return res.json(account)
+  }
+)
+
+/**
+ * 認証トークンを使用してサークル情報書き込み
+ * [POST] /auth/:authToken/accounts
  */
 router.post(
-  '/auth/:authCode',
+  '/:authToken/accounts',
   [
+    check('authToken')
+      .isString()
+      .not()
+      .isEmpty(),
     check('loginId')
       .isAlphanumeric()
       .not()
@@ -48,17 +69,20 @@ router.post(
       .not()
       .isEmpty()
   ],
-  /* async */ (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
-    // const account = await authModule.getCircle(authCode)
-    // const writeStatus = await accountModule.writeData(account.circleId, loginId, passwordHash, displayName)
-
-    return res.json({
-      circleId: '114514'
-    })
+    const body = req.body
+    const account = await auth.getCircle(req.params.authToken)
+    accounts.update(
+      account.accountId,
+      body.loginId,
+      body.passwordHash,
+      body.displayName
+    )
+    return res.status(200).json({ status: true })
   }
 )
 

@@ -3,7 +3,7 @@
  * @param {string} eventId イベントID
  * @returns {Promise} イベント情報
  */
-export const get = eventId =>
+const get = eventId =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
@@ -12,7 +12,7 @@ export const get = eventId =>
  * 申込み者一覧を取得
  * @param {string} eventId イベントID
  */
-export const getApplications = eventId =>
+const getApplications = eventId =>
   new Promise((resolve, reject) => {
     return resolve({
       'xxxxxxxxxx-xxxxxxxxxx-xxxx': {
@@ -38,3 +38,8 @@ export const getApplications = eventId =>
       }
     })
   })
+
+export default {
+  get,
+  getApplications
+}
