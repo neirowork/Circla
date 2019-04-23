@@ -3,6 +3,10 @@ import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
 
+import circlaConfig from '../../circla.config'
+
+import jwt from 'jsonwebtoken'
+
 import errorResponse from '../assets/errors'
 
 /**
@@ -62,8 +66,18 @@ router.post(
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
+    const token = jwt.sign(
+      {
+        circleId: '1234567890abcdef',
+        gravatarId: '1145141919810',
+        displayName: '染宮ねいろ',
+        scope: 'USER'
+      },
+      circlaConfig.jwt.key
+    )
+
     return res.json({
-      token: '1919810'
+      token
     })
   }
 )
