@@ -1,44 +1,15 @@
 /**
- * サークルIDから申込んだイベントの一覧を取得
- * @param {string} circleId
- * @returns {Promise} 申込みデータ
- */
-export const getApplications = circleId =>
-  new Promise((resolve, reject) => {
-    return resolve({
-      'myfes2019-1555952581-0918': {
-        circleId: '1234567891234567890abcdef1234567890abcdef',
-        paymoId: 'U-1145141919810',
-        circleName: 'ジーセカンド',
-        general: {
-          genreCode: '114',
-          overview: '1',
-          amount: '514'
-        },
-        congruence: {
-          anotherPaymoId: 'U-1145141919810',
-          anotherCircleId: '1919810'
-        },
-        remarks: '114514',
-        status: 'APPLICATIONS_COMPLETED',
-        timestamp: '1145141919810',
-        space: {
-          block: '草',
-          number: '15'
-        }
-      }
-    })
-  })
-
-/**
  * 仮申込みデータ作成
- * @param {string} eventId
- * @param {string} paymoId
- * @param {string} circleName
- * @param {object} generalInfos
- * @param {object} congruenceInfos
+ * @param {string} accountId 内部ID
+ * @param {string} eventId イベントID
+ * @param {string} paymoId 支払いID(Paymo)
+ * @param {string} circleName サークル名
+ * @param {object} generalInfos 頒布情報
+ * @param {object} congruenceInfos 合体申込み情報
+ * @returns {Promise} 申込みID
  */
-export const createApplication = (
+export const create = (
+  accountId,
   eventId,
   paymoId,
   circleName,
@@ -46,14 +17,15 @@ export const createApplication = (
   congruenceInfos
 ) =>
   new Promise((resolve, reject) => {
-    return resolve('1145-1919-8100')
+    return resolve('xxxxxxxxxx-xxxxxxxxxx-xxxx')
   })
 
 /**
  * 申込みを有効化する
- * @param {string} applicationCode
+ * @param {string} applicationID 申込みID
+ * @returns {Promise} 有効化ステータス
  */
-export const vaildApplication = applicationCode =>
+export const vaildApplication = applicationID =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })

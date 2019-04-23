@@ -1,37 +1,39 @@
 /**
- * 認証コードを作成
- * @param {string} circleId
+ * 認証トークンを作成
+ * @param {string} accountId 内部ID
+ * @returns {string} 認証トークン
  */
-export const createAuthCode = circleId =>
+export const createToken = accountId =>
   new Promise((resolve, reject) => {
-    return resolve('1145141919810')
+    return resolve('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
   })
 
 /**
- * 認証コードからサークル情報を取得
- * @param {string} authCode 認証コード
- * @returns {Promise} サークル情報
+ * 認証トークンからアカウント情報を取得
+ * @param {string} authToken 認証トークン
+ * @returns {Promise} アカウント情報
  */
-export const getCircle = authCode =>
+export const getCircle = authToken =>
   new Promise((resolve, reject) => {
     // if(DB) {
     //   return reject('アカウントが見つかりませんでした。')
     // }
 
     return resolve({
-      circleId: '114514',
-      emailAddress: '114514',
-      displayName: '染宮ねいろ',
-      scope: 'ADMIN'
+      accountId: 'xxxxxxxxxxxxxxxx',
+      gravatarId: 'xxxxxxxxxxxxxxxx',
+      emailAddress: 'example@example.com',
+      displayName: '舞宮蔵子',
+      scope: 'USER'
     })
   })
 
 /**
- * 認証コードを無効化する
- * @param {string} authCode
- * @returns {Promise} 無効化結果
+ * 認証トークンを無効化する
+ * @param {string} authToken 認証トークン
+ * @returns {Promise} 無効化ステータス
  */
-export const invokeCode = authCode =>
+export const invokeCode = authToken =>
   new Promise((resolve, reject) => {
     return resolve(true)
   })
