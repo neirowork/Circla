@@ -1,12 +1,36 @@
+import db from '../libs/db'
+import crypto from 'crypto'
+
 /**
  * アカウント存在確認
  * メールアドレスか、ログインIDが存在したらtrueを返す
  * @param {string} mailAddress
  * @param {string} loginId
  */
-const exist = (emailAddress = '', loginId = '') => {
-  return false
-}
+const exist = (emailAddress = '', loginId = '') =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) {
+        console.error(err)
+      }
+
+      con.query(
+        {
+          sql: 'SELECT * FROM accounts WHERE emailAddress = ? OR loginId = ?',
+          values: [emailAddress, loginId]
+        },
+        (err, res) => {
+          con.release()
+
+          if (err) {
+            console.error(err)
+          }
+
+          return resolve(!!res.length)
+        }
+      )
+    })
+  })
 
 /**
  * 仮アカウントを作成
@@ -14,12 +38,49 @@ const exist = (emailAddress = '', loginId = '') => {
  * @return {Promise} 内部ID
  */
 const createTempAccount = emailAddress =>
-  new Promise((resolve, reject) => {
-    if (this.exist(emailAddress)) {
+  new Promise(async (resolve, reject) => {
+    if (await exist(emailAddress)) {
       return reject('メールアドレスが既に存在しています。')
     }
 
-    return resolve('xxxxxxxxxxxxxxxx')
+    db.getConnection((err, con) => {
+      if (err) {
+        console.error(err)
+      }
+
+      con.query(
+        {
+          sql: 'INSERT INTO accounts SET ?',
+          values: { emailAddress, scope: 'USER' }
+        },
+        (err, res) => {
+          if (err) {
+            console.error(err)
+          }
+
+          const accountId = crypto
+            .createHash('sha256')
+            .update(`circla-account-${res.insertId}`)
+            .digest('hex')
+
+          con.query(
+            {
+              sql: 'UPDATE accounts SET internalId = ? WHERE id = ?',
+              values: [accountId, res.insertId]
+            },
+            (err, res) => {
+              con.release()
+
+              if (err) {
+                console.error(err)
+              }
+
+              return resolve(accountId)
+            }
+          )
+        }
+      )
+    })
   })
 
 /**
@@ -31,11 +92,26 @@ const createTempAccount = emailAddress =>
  * @returns {Promise} 更新ステータス
  */
 const update = (accountId, loginId, passwordHash, displayName) =>
-  new Promise((resolve, reject) => {
-    if (this.exist(null, loginId)) {
+  new Promise(async (resolve, reject) => {
+    if (await exist(null, loginId)) {
       return reject('ログインIDが既に存在しています。')
     }
-    return resolve(true)
+
+    con.query(
+      {
+        sql:
+          'UPDATE accounts SET loginId = ?, passwordHash = ?, displayName = ? WHERE internalId = ?',
+        values: [loginId, passwordHash, displayName, accountId]
+      },
+      (err, res) => {
+        if (err) {
+          console.error(err)
+          return resolve(false)
+        }
+
+        return resolve(true)
+      }
+    )
   })
 
 /**
@@ -46,16 +122,36 @@ const update = (accountId, loginId, passwordHash, displayName) =>
  */
 const auth = (loginId, passwordHash) =>
   new Promise((resolve, reject) => {
-    // if(DB) {
-    //   return reject('アカウントが見つかりませんでした。')
-    // }
+    db.getConnection((err, con) => {
+      con.query(
+        {
+          sql:
+            'SELECT * FROM accounts WHERE loginId = ? AND passwordHash = ? LIMIT 1',
+          values: [loginId, passwordHash]
+        },
+        (err, res) => {
+          if (err) {
+            console.error(err)
+            return reject(err)
+          }
 
-    return resolve({
-      accountId: 'xxxxxxxxxxxxxxxx',
-      gravatarId: 'xxxxxxxxxxxxxxxx',
-      emailAddress: 'example@example.com',
-      displayName: '舞宮蔵子',
-      scope: 'ADMIN'
+          if (res.length !== 1) {
+            return reject('認証に失敗しました。')
+          }
+
+          const account = res[0]
+          return resolve({
+            accountId: account.internalId,
+            gravatarId: crypto
+              .createHash('md5')
+              .update(account.emailAddress)
+              .digest('hex'),
+            emailAddress: account.emailAddress,
+            displayName: account.displayName,
+            scope: account.scope
+          })
+        }
+      )
     })
   })
 

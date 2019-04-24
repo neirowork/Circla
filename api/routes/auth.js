@@ -76,12 +76,17 @@ router.post(
 
     const body = req.body
     const account = await auth.getCircle(req.params.authToken)
-    accounts.update(
+
+    const updateStatus = await accounts.update(
       account.accountId,
       body.loginId,
       body.passwordHash,
       body.displayName
     )
+    if (!updateStatus) {
+      return res.status(500).json({ message: '更新に失敗しました。' })
+    }
+
     return res.status(200).json({ status: true })
   }
 )

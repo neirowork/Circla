@@ -98,7 +98,8 @@ router.post(
       .auth(body.loginId, body.passwordHash)
       .catch(err => {
         if (err) {
-          return res.status(403).json({ message: '認証に失敗しました。' })
+          res.status(403).json({ message: '認証に失敗しました。' })
+          throw err
         }
       })
 
