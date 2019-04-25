@@ -183,9 +183,10 @@ const getApplications = accountId =>
           accountId: 'yyyyyyyyyyyyyyyy'
         },
         remarks: '',
-        status: 'APPLICATIONS_COMPLETED',
+        status: 'COMPLETED',
         timestamp: 'xxxxxxxxxx',
         space: {
+          status: '',
           block: 'x',
           number: 'xx'
         }
@@ -193,9 +194,80 @@ const getApplications = accountId =>
     })
   })
 
+/**
+ * 指定ユーザの指定イベントへの申込み情報を取得する
+ * @param {string} accountId 内部ID
+ * @param {string} eventId イベントID
+ * @returns {Promise} 申込み情報
+ */
+const getApplication = (accountId, eventId) =>
+  new Promise(async (resolve, reject) => {
+    const app = await loadApplication(accountId, eventId).catch(err =>
+      reject(err)
+    )
+
+    return resovle({
+      applicationId: app.applicationId,
+      paymoId: app.paymoId,
+      circleName: app.circleName,
+      general: {
+        genreCode: app.genreCode,
+        overview: app.overview,
+        amount: app.amount
+      },
+      congruence: {
+        paymoId: app.congruencePaymoId,
+        accountId: app.congruenceAccountId
+      },
+      remarks: app.remarks,
+      status: app.status,
+      timestamp: app.timestamp,
+      space: {
+        status: app.spacePlacementStatus,
+        block: app.spaceBlock,
+        number: app.spaceNumber
+      }
+    })
+  })
+
+/**
+ * 内部IDを使用して、データベースから申込み情報(単体)を取得する
+ * @param {string} accountId 内部ID
+ * @param {string} eventId イベントID
+ * @returns {Promise} 申込み情報
+ */
+const loadApplication = (accountId, eventId) =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) {
+        return reject(err)
+      }
+
+      con.query(
+        {
+          sql:
+            "SELECT * FROM applications WHERE accountId = ? AND eventId = ? AND NOT ( status = 'CANCELED' )",
+          values: [accountId, eventId]
+        },
+        (err, res) => {
+          if (err) {
+            return reject(err)
+          }
+
+          if (!res.length) {
+            return resolve(false)
+          }
+
+          return resolve(res[0])
+        }
+      )
+    })
+  })
+
 export default {
   createTempAccount,
   update,
   auth,
+  getApplication,
   getApplications
 }
