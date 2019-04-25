@@ -97,21 +97,27 @@ const update = (accountId, loginId, passwordHash, displayName) =>
       return reject('ログインIDが既に存在しています。')
     }
 
-    con.query(
-      {
-        sql:
-          'UPDATE accounts SET loginId = ?, passwordHash = ?, displayName = ? WHERE internalId = ?',
-        values: [loginId, passwordHash, displayName, accountId]
-      },
-      (err, res) => {
-        if (err) {
-          console.error(err)
-          return resolve(false)
-        }
-
-        return resolve(true)
+    db.getConnection((err, con) => {
+      if (err) {
+        return reject(err)
       }
-    )
+
+      con.query(
+        {
+          sql:
+            'UPDATE accounts SET loginId = ?, passwordHash = ?, displayName = ? WHERE internalId = ?',
+          values: [loginId, passwordHash, displayName, accountId]
+        },
+        (err, res) => {
+          con.release()
+          if (err) {
+            return reject(err)
+          }
+
+          return resolve(true)
+        }
+      )
+    })
   })
 
 /**

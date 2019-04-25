@@ -50,9 +50,10 @@ router.post(
       .createTempAccount(req.body.emailAddress)
       .catch(err => {
         if (err) {
-          return res
+          res
             .status(409)
             .json({ message: 'そのメールアドレスは既に存在しています。' })
+          throw err
         }
       })
 
@@ -60,7 +61,8 @@ router.post(
       .update(accountId, body.loginId, body.passwordHash, body.displayName)
       .catch(err => {
         if (err) {
-          return res.status(404).json({ message: '内部IDが見つかりません' })
+          res.status(404).json({ message: '内部IDが見つかりません' })
+          throw err
         }
       })
 
@@ -147,9 +149,10 @@ router.post(
       .createTempAccount(req.body.emailAddress)
       .catch(err => {
         if (err) {
-          return res
+          res
             .status(409)
             .json({ message: 'そのメールアドレスは既に存在しています。' })
+          throw err
         }
       })
 
