@@ -10,6 +10,7 @@ import applications from '../libs/applications'
 
 import errorResponse from '../assets/errors'
 import * as eventsModule from '../libs/events'
+import accounts from '../libs/accounts'
 
 /**
  * ここから下 認証必要ルート
@@ -84,14 +85,9 @@ router.post(
       .isInt()
       .not()
       .isEmpty(),
-    check('congruence.paymoId')
-      .isString()
-      .not()
-      .isEmpty(),
-    check('congruence.accountId')
-      .isString()
-      .not()
-      .isEmpty()
+    check('congruence.paymoId').isString(),
+    check('congruence.accountId').isString(),
+    check('remarks').isString()
   ],
   async (req, res) => {
     // #region バリデーション
@@ -101,19 +97,33 @@ router.post(
     // #endregion
 
     const eventId = req.params.eventId
+    const accountId = req.token.accountId
     const body = req.body
 
     if (!events.get(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    const applicationId = await applications.create(
-      req.token.accountId,
-      eventId,
-      body.paymoId,
-      body.circleName,
-      body.general,
-      body.congruence
-    )
+    const application = await accounts.getApplication(accountId, eventId)
+    if (application) {
+      return res.status(409).json({ message: '既に申し込み済みです。' })
+    }
+
+    const applicationId = await applications
+      .create(
+        accountId,
+        eventId,
+        body.paymoId,
+        body.circleName,
+        body.general,
+        body.congruence,
+        body.remarks
+      )
+      .catch(err => {
+        if (err) {
+          res.status(500).json({ message: '申込み処理が失敗しました。' })
+          throw err
+        }
+      })
 
     return res.json({
       applicationId
