@@ -9,7 +9,7 @@ export default {
       
       この度は、${eventName}にお申込みいただきありがとうございます。
       
-      以前お申込みしていただいた${eventName}の申し込み管理システムが、Circlaに変更されましたので、あなたのCirclaIDが自動発行されました。
+      以前お申込みしていただいた${eventName}の申込み管理システムが、Circlaに変更されましたので、あなたのCirclaIDが自動発行されました。
       
       以下のURLにアクセスして、本人確認を行ってください。
       https://circla.neiro.work/verify/${verifyHash}
@@ -18,7 +18,7 @@ export default {
 
       -----
 
-      ${eventName}へ申し込みした覚えのない方は、このままメールを破棄してください。`
+      ${eventName}へ申込みした覚えのない方は、このままメールを破棄してください。`
     }
   }
 }

@@ -105,7 +105,7 @@ router.post(
 
     const application = await accounts.getApplication(accountId, eventId)
     if (application) {
-      return res.status(409).json({ message: '既に申し込み済みです。' })
+      return res.status(409).json({ message: '既に申込み済みです。' })
     }
 
     const applicationId = await applications

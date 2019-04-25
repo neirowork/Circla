@@ -1,5 +1,6 @@
 require('date-utils')
 import db from '../libs/db'
+import { connect } from 'net'
 
 /**
  * 申込み情報の取得
@@ -164,6 +165,8 @@ const loadApplication = applicationId =>
           values: { applicationId }
         },
         (err, res) => {
+          con.release()
+
           if (err) {
             return reject(err)
           }

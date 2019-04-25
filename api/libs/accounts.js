@@ -110,6 +110,7 @@ const update = (accountId, loginId, passwordHash, displayName) =>
         },
         (err, res) => {
           con.release()
+
           if (err) {
             return reject(err)
           }
@@ -136,8 +137,9 @@ const auth = (loginId, passwordHash) =>
           values: [loginId, passwordHash]
         },
         (err, res) => {
+          con.release()
+
           if (err) {
-            console.error(err)
             return reject(err)
           }
 
@@ -206,7 +208,7 @@ const getApplication = (accountId, eventId) =>
       reject(err)
     )
 
-    return resovle({
+    return resolve({
       applicationId: app.applicationId,
       paymoId: app.paymoId,
       circleName: app.circleName,
@@ -250,6 +252,8 @@ const loadApplication = (accountId, eventId) =>
           values: [accountId, eventId]
         },
         (err, res) => {
+          con.release()
+
           if (err) {
             return reject(err)
           }
