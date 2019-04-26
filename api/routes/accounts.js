@@ -186,7 +186,14 @@ router.post(
       return res.status(422).json(errorResponse.validation(errors))
     // #endregion
 
-    const authToken = await auth.createToken(req.params.accountId)
+    const authToken = await auth
+      .createToken(req.params.accountId)
+      .catch(err => {
+        if (err.message === 'NOT_FOUND')
+          res.status(404).json({ message: 'アカウントが見つかりません' })
+
+        throw err
+      })
 
     return res.json({
       authToken

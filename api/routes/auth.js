@@ -40,7 +40,14 @@ router.get(
       .isEmpty()
   ],
   async (req, res) => {
-    const account = await auth.getCircle(req.params.authToken)
+    const account = await auth.getAccount(req.params.authToken).catch(err => {
+      res.status(500).json({ message: '内部エラー' })
+      throw err
+    })
+
+    if (!account)
+      return res.status(404).json({ message: '認証トークンが無効です' })
+
     return res.json(account)
   }
 )
@@ -74,16 +81,37 @@ router.post(
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
 
-    const body = req.body
-    const account = await auth.getCircle(req.params.authToken)
+    const authToken = req.params.authToken
 
-    const updateStatus = await accounts.update(
-      account.accountId,
-      body.loginId,
-      body.passwordHash,
-      body.displayName
-    )
-    if (!updateStatus) {
+    const body = req.body
+    const account = await auth.getAccount(authToken).catch(err => {
+      res.status(500).json({ message: '内部エラー' })
+      throw err
+    })
+
+    if (!account)
+      return res.status(404).json({ message: '認証トークンが無効です' })
+
+    const updateStatus = await accounts
+      .update(
+        account.accountId,
+        body.loginId,
+        body.passwordHash,
+        body.displayName
+      )
+      .catch(err => {
+        if (err.message === 'EXISTED') {
+          res.status(409).json({ message: 'ログインIDが既に存在しています' })
+        } else {
+          res.status(500).json({ message: '内部エラー' })
+        }
+
+        throw err
+      })
+
+    if (updateStatus) {
+      auth.invoke(authToken)
+    } else {
       return res.status(500).json({ message: '更新に失敗しました。' })
     }
 

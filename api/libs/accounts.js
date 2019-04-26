@@ -117,7 +117,7 @@ const createTempAccount = emailAddress =>
 const update = (accountId, loginId, passwordHash, displayName) =>
   new Promise(async (resolve, reject) => {
     if (await existAuthInfo(null, loginId)) {
-      return reject('ログインIDが既に存在しています。')
+      return reject(new Error('EXISTED'))
     }
 
     db.getConnection((err, con) => {
