@@ -5,6 +5,7 @@ const router = express.Router()
 
 import jwtMiddleware from '../middlewares/jwt'
 
+import accounts from '../libs/accounts'
 import personalInfos from '../libs/personalInfo'
 
 import errorResponse from '../assets/errors'
@@ -34,14 +35,19 @@ router.post(
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  async (req, res) => {
     // #region バリデーション
     const errors = validationResult(req).array()
     if (errors.length)
       return res.status(422).json(errorResponse.validation(errors))
     // #endregion
 
-    personalInfos.update(req.token.accountId, req.body.data)
+    await personalInfos
+      .update(req.token.accountId, req.body.data)
+      .catch(err => {
+        res.status(500).json({ message: '更新に失敗しました' })
+        throw err
+      })
 
     return res.status(200).json({ status: true })
   }
@@ -49,12 +55,12 @@ router.post(
 
 /**
  * 🔒(ADMIN) 個人情報の追加(運営用)
- * [POST] /personal-info/:circleId
+ * [POST] /personal-info/:accountId
  */
 router.post(
-  '/:circleId',
+  '/:accountId',
   [
-    check('circleId')
+    check('accountId')
       .isString()
       .not()
       .isEmpty(),
@@ -71,7 +77,7 @@ router.post(
       .not()
       .isEmpty()
   ],
-  (req, res) => {
+  async (req, res) => {
     // 管理者以外は通さない
     if (req.token.scope !== 'ADMIN') {
       return res.status(403).json(errorResponse.forbidden)
@@ -83,7 +89,15 @@ router.post(
       return res.status(422).json(errorResponse.validation(errors))
     // #endregion
 
-    personalInfos.update(req.params.accountId, req.body.data)
+    if (!(await accounts.get(req.params.accountId)))
+      return res.status(404).json({ message: 'アカウントが見つかりません' })
+
+    await personalInfos
+      .update(req.params.accountId, req.body.data)
+      .catch(err => {
+        res.status(500).json({ message: '更新に失敗しました' })
+        throw err
+      })
 
     return res.status(200).json({ status: true })
   }
