@@ -54,9 +54,44 @@ const create = (
   congruenceInfos,
   remarks
 ) =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     const timestamp = Math.floor(new Date().getTime() / 1000)
 
+    const applicationNumber = await insertApplication(
+      accountId,
+      eventId,
+      paymoId,
+      circleName,
+      generalInfos,
+      congruenceInfos,
+      remarks,
+      timestamp
+    ).catch(err => reject(err))
+
+    const applicationId = generateApplicationId(
+      eventId,
+      timestamp,
+      applicationNumber
+    )
+    const fetchStatus = await fetchApplicationId(
+      applicationNumber,
+      applicationId
+    ).catch(err => reject(err))
+
+    if (fetchStatus) return resolve(applicationId)
+  })
+
+const insertApplication = (
+  accountId,
+  eventId,
+  paymoId,
+  circleName,
+  generalInfos,
+  congruenceInfos,
+  remarks,
+  timestamp
+) =>
+  new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
 
@@ -79,25 +114,33 @@ const create = (
           }
         },
         (err, res) => {
+          con.release()
           if (err) return reject(err)
 
-          const applicationId = `${eventId}-${timestamp}-${(
-            '0000' + res.insertId
-          ).slice(-4)}`
+          return resolve(res.insertId)
+        }
+      )
+    })
+  })
 
-          con.query(
-            {
-              sql: 'UPDATE applications SET applicationId = ? WHERE id = ?',
-              values: [applicationId, res.insertId]
-            },
-            (err, res) => {
-              con.release()
+const generateApplicationId = (eventId, timestamp, applicationNumber) =>
+  `${eventId}-${timestamp}-${('0000' + applicationNumber).slice(-4)}`
 
-              if (err) return reject(err)
+const fetchApplicationId = (applicationNumber, applicationId) =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) return reject(err)
 
-              return resolve(applicationId)
-            }
-          )
+      con.query(
+        {
+          sql: 'UPDATE applications SET applicationId = ? WHERE id = ?',
+          values: [applicationId, applicationNumber]
+        },
+        err => {
+          con.release()
+          if (err) return reject(err)
+
+          return resolve(true)
         }
       )
     })
