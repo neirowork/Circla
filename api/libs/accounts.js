@@ -64,7 +64,9 @@ const createTempAccount = emailAddress =>
   new Promise(async (resolve, reject) => {
     if (await existAuthInfo(emailAddress)) return reject('EXISTED_ADDRESS')
 
-    const accountNumber = await insertTempAccount(emailAddress)
+    const accountNumber = await insertTempAccount(emailAddress).catch(err => {
+      return reject(err)
+    })
     const accountId = generateAccountId(accountNumber)
     const applyStatus = await applyAccountId(accountNumber, accountId).catch(
       err => {
