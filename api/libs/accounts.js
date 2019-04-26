@@ -37,9 +37,7 @@ const get = accountId =>
 const existAuthInfo = (emailAddress = '', loginId = '') =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
-      if (err) {
-        console.error(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -64,43 +62,61 @@ const existAuthInfo = (emailAddress = '', loginId = '') =>
  */
 const createTempAccount = emailAddress =>
   new Promise(async (resolve, reject) => {
-    if (await existAuthInfo(emailAddress)) {
-      return reject('メールアドレスが既に存在しています。')
-    }
+    if (await existAuthInfo(emailAddress)) return reject('EXISTED_ADDRESS')
 
-    db.getConnection((err, con) => {
-      if (err) {
-        console.error(err)
+    const accountNumber = await insertTempAccount(emailAddress)
+    const accountId = generateAccountId(accountNumber)
+    const applyStatus = await applyAccountId(accountNumber, accountId).catch(
+      err => {
+        return reject(err)
       }
+    )
 
+    if (applyStatus) return resolve(true)
+  })
+
+const insertTempAccount = emailAddress =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) return reject(err)
       con.query(
         {
           sql: 'INSERT INTO accounts SET ?',
           values: { emailAddress, scope: 'USER' }
         },
-        (err, res) => {
-          if (err) {
-            console.error(err)
-          }
+        async (err, res) => {
+          con.release()
+          if (err) return reject(err)
 
-          const accountId = crypto
-            .createHash('sha256')
-            .update(`circla-account-${res.insertId}`)
-            .digest('hex')
+          return resolve(res.insertId)
+        }
+      )
+    })
+  })
 
-          con.query(
-            {
-              sql: 'UPDATE accounts SET internalId = ? WHERE id = ?',
-              values: [accountId, res.insertId]
-            },
-            (err, res) => {
-              con.release()
+const generateAccountId = accountNumber => {
+  return crypto
+    .createHash('sha256')
+    .update(`circla-account-${accountNumber}`)
+    .digest('hex')
+}
 
-              if (err) return reject(err)
+const applyAccountId = (accountNumber, accountId) =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) return reject(err)
 
-              return resolve(accountId)
-            }
-          )
+      con.query(
+        {
+          sql: 'UPDATE accounts SET internalId = ? WHERE id = ?',
+          values: [accountId, accountNumber]
+        },
+        err => {
+          con.release()
+
+          if (err) return reject(err)
+
+          return resolve(true)
         }
       )
     })
