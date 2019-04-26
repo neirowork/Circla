@@ -77,9 +77,7 @@ const getApplications = eventId =>
 const loadApplications = eventId =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
-      if (err) {
-        return reject(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -90,9 +88,7 @@ const loadApplications = eventId =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
+          if (err) return reject(err)
 
           return resolve(res)
         }

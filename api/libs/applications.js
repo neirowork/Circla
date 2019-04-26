@@ -58,9 +58,7 @@ const create = (
     const timestamp = Math.floor(new Date().getTime() / 1000)
 
     db.getConnection((err, con) => {
-      if (err) {
-        return reject(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -81,9 +79,7 @@ const create = (
           }
         },
         (err, res) => {
-          if (err) {
-            return reject(err)
-          }
+          if (err) return reject(err)
 
           const applicationId = `${eventId}-${timestamp}-${(
             '0000' + res.insertId
@@ -97,9 +93,7 @@ const create = (
             (err, res) => {
               con.release()
 
-              if (err) {
-                return reject(err)
-              }
+              if (err) return reject(err)
 
               return resolve(applicationId)
             }
@@ -123,9 +117,7 @@ const vaild = applicationId =>
     }
 
     db.getConnection((err, con) => {
-      if (err) {
-        return reject(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -135,9 +127,7 @@ const vaild = applicationId =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
+          if (err) return reject(err)
 
           return resolve(true)
         }
@@ -167,13 +157,8 @@ const loadApplication = applicationId =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
-
-          if (!res.length) {
-            return resolve(false)
-          }
+          if (err) return reject(err)
+          if (!res.length) return resolve(false)
 
           return resolve(res[0])
         }

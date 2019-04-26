@@ -2,12 +2,39 @@ import db from '../libs/db'
 import crypto from 'crypto'
 
 /**
+ * 内部IDからアカウント情報を取得する
+ * @param {*} accountId 内部ID
+ * @returns {Promise} アカウント情報
+ */
+const get = accountId =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) return reject(err)
+
+      con.query(
+        {
+          sql: 'SELECT * FROM accounts WHERE ?',
+          values: { internalId: accountId }
+        },
+        (err, res) => {
+          con.release()
+
+          if (err) return reject(err)
+          if (!res.length) return resolve(false)
+
+          return resolve(res[0])
+        }
+      )
+    })
+  })
+
+/**
  * アカウント存在確認
  * メールアドレスか、ログインIDが存在したらtrueを返す
  * @param {string} mailAddress
  * @param {string} loginId
  */
-const exist = (emailAddress = '', loginId = '') =>
+const existAuthInfo = (emailAddress = '', loginId = '') =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) {
@@ -22,9 +49,7 @@ const exist = (emailAddress = '', loginId = '') =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            console.error(err)
-          }
+          if (err) return reject(err)
 
           return resolve(!!res.length)
         }
@@ -39,7 +64,7 @@ const exist = (emailAddress = '', loginId = '') =>
  */
 const createTempAccount = emailAddress =>
   new Promise(async (resolve, reject) => {
-    if (await exist(emailAddress)) {
+    if (await existAuthInfo(emailAddress)) {
       return reject('メールアドレスが既に存在しています。')
     }
 
@@ -71,9 +96,7 @@ const createTempAccount = emailAddress =>
             (err, res) => {
               con.release()
 
-              if (err) {
-                console.error(err)
-              }
+              if (err) return reject(err)
 
               return resolve(accountId)
             }
@@ -93,7 +116,7 @@ const createTempAccount = emailAddress =>
  */
 const update = (accountId, loginId, passwordHash, displayName) =>
   new Promise(async (resolve, reject) => {
-    if (await exist(null, loginId)) {
+    if (await existAuthInfo(null, loginId)) {
       return reject('ログインIDが既に存在しています。')
     }
 
@@ -111,9 +134,7 @@ const update = (accountId, loginId, passwordHash, displayName) =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
+          if (err) return reject(err)
 
           return resolve(true)
         }
@@ -139,13 +160,8 @@ const auth = (loginId, passwordHash) =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
-
-          if (res.length !== 1) {
-            return reject('認証に失敗しました。')
-          }
+          if (err) return reject(err)
+          if (res.length !== 1) return reject('認証に失敗しました。')
 
           const account = res[0]
           return resolve({
@@ -241,9 +257,7 @@ const getApplication = (accountId, eventId) =>
 const loadApplication = (accountId, eventId) =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
-      if (err) {
-        return reject(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -254,13 +268,8 @@ const loadApplication = (accountId, eventId) =>
         (err, res) => {
           con.release()
 
-          if (err) {
-            return reject(err)
-          }
-
-          if (!res.length) {
-            return resolve(false)
-          }
+          if (err) return reject(err)
+          if (!res.length) return resolve(false)
 
           return resolve(res[0])
         }
@@ -270,6 +279,7 @@ const loadApplication = (accountId, eventId) =>
 
 export default {
   createTempAccount,
+  get,
   update,
   auth,
   getApplication,
