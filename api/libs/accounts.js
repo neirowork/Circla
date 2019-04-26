@@ -175,8 +175,23 @@ const fetchAccount = (accountId, loginId, passwordHash, displayName) =>
  * @return {Promise} アカウント情報
  */
 const auth = (loginId, passwordHash) =>
+  new Promise(async (resolve, reject) => {
+    const account = await loadAccountWithIDPass(loginId, passwordHash).catch(
+      err => reject(err)
+    )
+    return resolve({
+      accountId: account.internalId,
+      emailAddress: account.emailAddress,
+      displayName: account.displayName,
+      scope: account.scope
+    })
+  })
+
+const loadAccountWithIDPass = (loginId, passwordHash) =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
+      if (err) return reject(err)
+
       con.query(
         {
           sql:
@@ -185,21 +200,10 @@ const auth = (loginId, passwordHash) =>
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
-          if (res.length !== 1) return reject('認証に失敗しました。')
+          if (!res.length) return reject(new Error('INVAILD_AUTH'))
 
-          const account = res[0]
-          return resolve({
-            accountId: account.internalId,
-            gravatarId: crypto
-              .createHash('md5')
-              .update(account.emailAddress)
-              .digest('hex'),
-            emailAddress: account.emailAddress,
-            displayName: account.displayName,
-            scope: account.scope
-          })
+          return resolve(res[0])
         }
       )
     })

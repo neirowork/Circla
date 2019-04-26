@@ -103,10 +103,12 @@ router.post(
     const account = await accounts
       .auth(body.loginId, body.passwordHash)
       .catch(err => {
-        if (err) {
+        if (err.message === 'INVAILD_AUTH') {
           res.status(403).json({ message: '認証に失敗しました。' })
-          throw err
+        } else {
+          res.status(500).json({ message: '内部エラーが発生しました。' })
         }
+        throw err
       })
 
     const jwtToken = jwt.sign(account, circlaConfig.jwt.key, {
