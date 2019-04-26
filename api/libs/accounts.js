@@ -20,7 +20,7 @@ const get = accountId =>
           con.release()
 
           if (err) return reject(err)
-          if (!res.length) return resolve(false)
+          if (!res.length) return resolve()
 
           return resolve(res[0])
         }
@@ -46,7 +46,6 @@ const existAuthInfo = (emailAddress = '', loginId = '') =>
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(!!res.length)
@@ -177,8 +176,12 @@ const fetchAccount = (accountId, loginId, passwordHash, displayName) =>
 const auth = (loginId, passwordHash) =>
   new Promise(async (resolve, reject) => {
     const account = await loadAccountWithIDPass(loginId, passwordHash).catch(
-      err => reject(err)
+      err => {
+        reject(err)
+      }
     )
+
+    if (!account) return resolve()
     return resolve({
       accountId: account.internalId,
       emailAddress: account.emailAddress,
@@ -201,7 +204,7 @@ const loadAccountWithIDPass = (loginId, passwordHash) =>
         (err, res) => {
           con.release()
           if (err) return reject(err)
-          if (!res.length) return reject(new Error('INVAILD_AUTH'))
+          if (!res.length) return resolve()
 
           return resolve(res[0])
         }
@@ -254,6 +257,7 @@ const getApplication = (accountId, eventId) =>
       reject(err)
     )
 
+    if (!app) return resolve()
     return resolve({
       applicationId: app.applicationId,
       paymoId: app.paymoId,
@@ -292,14 +296,13 @@ const loadApplication = (accountId, eventId) =>
       con.query(
         {
           sql:
-            "SELECT * FROM applications WHERE accountId = ? AND eventId = ? AND NOT ( status = 'CANCELED' )",
+            'SELECT * FROM applications WHERE accountId = ? AND eventId = ? AND NOT ( status = "CANCELED" )',
           values: [accountId, eventId]
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
-          if (!res.length) return resolve(false)
+          if (!res.length) return resolve()
 
           return resolve(res[0])
         }

@@ -103,13 +103,12 @@ router.post(
     const account = await accounts
       .auth(body.loginId, body.passwordHash)
       .catch(err => {
-        if (err.message === 'INVAILD_AUTH') {
-          res.status(403).json({ message: '認証に失敗しました。' })
-        } else {
-          res.status(500).json({ message: '内部エラーが発生しました。' })
-        }
+        res.status(500).json({ message: '内部エラーが発生しました。' })
         throw err
       })
+
+    if (!account)
+      return res.status(403).json({ message: '認証に失敗しました。' })
 
     const jwtToken = jwt.sign(account, circlaConfig.jwt.key, {
       expiresIn: '1d'
@@ -154,12 +153,14 @@ router.post(
     const accountId = await accounts
       .createTempAccount(req.body.emailAddress)
       .catch(err => {
-        if (err) {
+        if (err.message === 'EXISTED_ADDRESS') {
           res
             .status(409)
             .json({ message: 'そのメールアドレスは既に存在しています。' })
-          throw err
+        } else {
+          res.status(500).json({ message: '内部エラーが発生しました。' })
         }
+        throw err
       })
 
     return res.json({
@@ -195,9 +196,11 @@ router.post(
     const authToken = await auth
       .createToken(req.params.accountId)
       .catch(err => {
-        if (err.message === 'NOT_FOUND')
+        if (err.message === 'NOT_FOUND') {
           res.status(404).json({ message: 'アカウントが見つかりません' })
-
+        } else {
+          res.status(500).json({ message: '内部エラーが発生しました。' })
+        }
         throw err
       })
 
