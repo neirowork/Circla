@@ -74,7 +74,7 @@ const createTempAccount = emailAddress =>
       }
     )
 
-    if (applyStatus) return resolve(true)
+    if (applyStatus) return resolve(accountId)
   })
 
 const insertTempAccount = emailAddress =>
@@ -134,14 +134,23 @@ const applyAccountId = (accountNumber, accountId) =>
  */
 const update = (accountId, loginId, passwordHash, displayName) =>
   new Promise(async (resolve, reject) => {
-    if (await existAuthInfo(null, loginId)) {
-      return reject(new Error('EXISTED'))
-    }
+    if (await existAuthInfo(null, loginId))
+      return reject(new Error('EXISTED_LOGINID'))
 
+    const fetchStatus = await fetchAccount(
+      accountId,
+      loginId,
+      passwordHash,
+      displayName
+    ).catch(err => reject(err))
+
+    return resolve(fetchStatus)
+  })
+
+const fetchAccount = (accountId, loginId, passwordHash, displayName) =>
+  new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
-      if (err) {
-        return reject(err)
-      }
+      if (err) return reject(err)
 
       con.query(
         {
@@ -149,9 +158,8 @@ const update = (accountId, loginId, passwordHash, displayName) =>
             'UPDATE accounts SET loginId = ?, passwordHash = ?, displayName = ? WHERE internalId = ?',
           values: [loginId, passwordHash, displayName, accountId]
         },
-        (err, res) => {
+        err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)
