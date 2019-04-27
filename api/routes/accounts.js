@@ -12,9 +12,6 @@ import errorResponse from '../assets/errors'
 
 import accounts from '../libs/accounts'
 import auth from '../libs/auth'
-import mail from '../libs/mail'
-
-import mailTemplate from '../assets/mail'
 
 /**
  * アカウントの作成
