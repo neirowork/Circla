@@ -42,14 +42,18 @@ router.post(
       return res.status(422).json(errorResponse.validation(errors))
     // #endregion
 
-    await personalInfos
+    const updateStatus = await personalInfos
       .update(req.token.accountId, req.body.data)
       .catch(err => {
-        res.status(500).json({ message: '更新に失敗しました' })
+        if (err.message === 'INVAILD_POSTALCODE') {
+          res.status(422).json({ message: '無効な郵便番号です。' })
+        } else {
+          res.status(500).json({ message: '内部エラーが発生しました。' })
+        }
         throw err
       })
 
-    return res.status(200).json({ status: true })
+    return res.status(200).json({ status: !!updateStatus })
   }
 )
 
@@ -92,14 +96,18 @@ router.post(
     if (!(await accounts.get(req.params.accountId)))
       return res.status(404).json({ message: 'アカウントが見つかりません' })
 
-    await personalInfos
+    const updateStatus = await personalInfos
       .update(req.params.accountId, req.body.data)
       .catch(err => {
-        res.status(500).json({ message: '更新に失敗しました' })
+        if (err.message === 'INVAILD_POSTALCODE') {
+          res.status(422).json({ message: '無効な郵便番号です。' })
+        } else {
+          res.status(500).json({ message: '内部エラーが発生しました。' })
+        }
         throw err
       })
 
-    return res.status(200).json({ status: true })
+    return res.status(200).json({ status: !!updateStatus })
   }
 )
 

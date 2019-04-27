@@ -64,7 +64,7 @@ const update = (accountId, data) =>
     if (!(await get(accountId))) await add(accountId).catch(err => reject(err))
 
     if (!/^[0-9]{3}-[0-9]{4}$/.test(data.postalCode))
-      return reject(new RangeError('無効な郵便番号'))
+      return reject(new RangeError('INVAILD_POSTALCODE'))
 
     db.getConnection((err, con) => {
       if (err) return reject(err)

@@ -46,7 +46,10 @@ router.get(
     if (!events.get(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    const apps = await events.getApplications(eventId)
+    const apps = await events.getApplications(eventId).catch(err => {
+      res.status(500).json({ message: '内部エラーが発生しました。' })
+      throw err
+    })
 
     return res.json({
       applications: apps
@@ -103,7 +106,13 @@ router.post(
     if (!events.get(eventId))
       return res.status(404).json(errorResponse.event.notFound)
 
-    const application = await accounts.getApplication(accountId, eventId)
+    const application = await accounts
+      .getApplication(accountId, eventId)
+      .catch(err => {
+        res.status(500).json({ message: '内部エラーが発生しました。' })
+        throw err
+      })
+
     if (application) {
       return res.status(409).json({ message: '既に申込み済みです。' })
     }
@@ -119,10 +128,8 @@ router.post(
         body.remarks
       )
       .catch(err => {
-        if (err) {
-          res.status(500).json({ message: '申込み処理が失敗しました。' })
-          throw err
-        }
+        res.status(500).json({ message: '内部エラーが発生しました。' })
+        throw err
       })
 
     return res.json({
