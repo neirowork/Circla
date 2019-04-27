@@ -13,12 +13,23 @@ const createToken = accountId =>
     if (!(await accounts.get(accountId))) return reject(new Error('NOT_FOUND'))
 
     const timestamp = Math.floor(new Date().getTime() / 1000)
-    const oneTimeToken = crypto
-      .createHash('sha256')
-      .update(`${timestamp}-${accountId}`)
-      .digest('hex')
-    const authToken = `${accountId}-${oneTimeToken}`
+    const authToken = await generateOneTimeToken(accountId, timestamp)
+    const insertStatus = insertAuthInfo(accountId, authToken, timestamp).catch(
+      err => reject(err)
+    )
 
+    if (!insertStatus) return resolve()
+    return resolve(authToken)
+  })
+
+const generateOneTimeToken = (accountId, timestamp) =>
+  `${accountId}-${crypto
+    .createHash('sha256')
+    .update(`${timestamp}-${accountId}`)
+    .digest('hex')}`
+
+const insertAuthInfo = (accountId, authToken, timestamp) =>
+  new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
 
@@ -32,12 +43,11 @@ const createToken = accountId =>
             status: ''
           }
         },
-        (err, res) => {
+        err => {
           con.release()
+          if (err) return reject(err)
 
-          if (err) reject(err)
-
-          return resolve(authToken)
+          return resolve(true)
         }
       )
     })
@@ -49,11 +59,26 @@ const createToken = accountId =>
  * @returns {Promise} アカウント情報
  */
 const getAccount = authToken =>
-  new Promise((resolve, reject) => {
+  new Promise(async (resolve, reject) => {
     const date = new Date()
     date.setDate(date.getDate() - 1)
     const expireTime = Math.floor(date.getTime() / 1000)
 
+    const account = await loadAccountWithAuthToken(authToken, expireTime).catch(
+      err => reject(err)
+    )
+
+    if (!account) return resolve()
+    return resolve({
+      accountId: account.accountId,
+      emailAddress: account.emailAddress,
+      displayName: account.displayName,
+      scope: account.scope
+    })
+  })
+
+const loadAccountWithAuthToken = (authToken, expireTime) =>
+  new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
 
@@ -63,21 +88,12 @@ const getAccount = authToken =>
             'SELECT * FROM authInfos WHERE authToken = ? AND timestamp >= ? AND NOT ( status = "INVOKED" ) ORDER BY id DESC LIMIT 1',
           values: [authToken, expireTime]
         },
-        async (err, res) => {
+        (err, res) => {
           con.release()
-
           if (err) return reject(err)
-          if (!res.length) return resolve(false)
+          if (!res.length) return resolve()
 
-          const accountId = res[0].accountId
-          const account = await accounts.get(accountId)
-
-          return resolve({
-            accountId: accountId,
-            emailAddress: account.emailAddress,
-            displayName: account.displayName,
-            scope: account.scope
-          })
+          return resolve(res[0])
         }
       )
     })
@@ -89,6 +105,12 @@ const getAccount = authToken =>
  * @returns {Promise} 無効化ステータス
  */
 const invoke = authToken =>
+  new Promise(async (resolve, reject) => {
+    const fetchStatus = await fetchInvoke(authToken).catch(err => reject(err))
+    return resolve(!!fetchStatus)
+  })
+
+const fetchInvoke = authToken =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
@@ -100,9 +122,8 @@ const invoke = authToken =>
             authToken
           }
         },
-        (err, res) => {
+        err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)

@@ -68,9 +68,7 @@ const createTempAccount = emailAddress =>
     })
     const accountId = generateAccountId(accountNumber)
     const applyStatus = await applyAccountId(accountNumber, accountId).catch(
-      err => {
-        return reject(err)
-      }
+      err => reject(err)
     )
 
     if (applyStatus) return resolve(accountId)
