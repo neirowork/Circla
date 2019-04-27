@@ -5,12 +5,24 @@ const router = express.Router()
 
 import jwtMiddleware from '../middlewares/jwt'
 
+import errorResponse from '../assets/errors'
+
+import accounts from '../libs/accounts'
 import events from '../libs/events'
 import applications from '../libs/applications'
 
-import errorResponse from '../assets/errors'
-import * as eventsModule from '../libs/events'
-import accounts from '../libs/accounts'
+router.get('/:eventId', async (req, res) => {
+  const event = await events.get(req.params.eventId).catch(err => {
+    if (err.message === 'NOT_FOUND') {
+      res.status(404).json({ message: 'イベントが見つかりません。' })
+    } else {
+      res.status(500).json({ message: '内部エラーが発生しました。' })
+    }
+    throw err
+  })
+
+  return res.json(event)
+})
 
 /**
  * ここから下 認証必要ルート

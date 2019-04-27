@@ -7,7 +7,7 @@ import db from './db'
  */
 const get = eventId =>
   new Promise((resolve, reject) => {
-    if (eventId !== 'myfes2019') return reject('イベントが見つかりません')
+    if (eventId !== 'myfes2019') return reject(new Error('NOT_FOUND'))
 
     return resolve({
       name: 'マイフェス2019 ~Block Harmony.',
@@ -27,12 +27,13 @@ const get = eventId =>
           endAt: 1559401199
         }
       ],
-      fees: {
-        '1スペース': {
+      fees: [
+        {
+          name: '1スペース',
           fee: '4000',
           remarks: '(机半分90cm x 45cm・椅子2脚・サークル通行証2枚'
         }
-      }
+      ]
     })
   })
 
