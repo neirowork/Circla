@@ -198,24 +198,18 @@ router.post(
 
     const account = await accounts.get(req.params.accountId)
     if (!account)
-      return res.status(404).json({ message: 'アカウントが見つかりません' })
+      return res.status(404).json({ message: 'アカウントが見つかりません。' })
 
     const authInfo = await auth
       .createAuthInfo(req.params.accountId)
       .catch(err => {
         if (err.message === 'NOT_FOUND') {
-          res.status(404).json({ message: 'アカウントが見つかりません' })
+          res.status(404).json({ message: 'アカウントが見つかりません。' })
         } else {
           res.status(500).json({ message: '内部エラーが発生しました。' })
         }
         throw err
       })
-
-    const template = mailTemplate.verify(
-      authInfo.authToken,
-      authInfo.expireTime
-    )
-    mail.send(account.emailAddress, template.subject, template.text)
 
     return res.json({
       authToken: authInfo.authToken
