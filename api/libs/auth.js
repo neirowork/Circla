@@ -6,20 +6,22 @@ import db from './db'
 /**
  * 認証トークンを作成
  * @param {string} accountId 内部ID
- * @returns {string} 認証トークン
+ * @returns {Promise} 認証トークン及び有効期限
  */
-const createToken = accountId =>
+const createAuthInfo = accountId =>
   new Promise(async (resolve, reject) => {
     if (!(await accounts.get(accountId))) return reject(new Error('NOT_FOUND'))
 
-    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const date = new Date()
+    const timestamp = Math.floor(date.getTime() / 1000)
     const authToken = await generateOneTimeToken(accountId, timestamp)
     const insertStatus = insertAuthInfo(accountId, authToken, timestamp).catch(
       err => reject(err)
     )
 
     if (!insertStatus) return resolve()
-    return resolve(authToken)
+    date.setDate(date.getDate() + 1) // 有効期限用
+    return resolve({ authToken, expireTime: date })
   })
 
 const generateOneTimeToken = (accountId, timestamp) =>
@@ -64,9 +66,13 @@ const getAccount = authToken =>
     date.setDate(date.getDate() - 1)
     const expireTime = Math.floor(date.getTime() / 1000)
 
-    const account = await loadAccountWithAuthToken(authToken, expireTime).catch(
+    const authInfo = await loadAuthInfoWithExpire(authToken, expireTime).catch(
       err => reject(err)
     )
+
+    const account = await accounts
+      .get(authInfo.accountId)
+      .catch(err => reject(err))
 
     if (!account) return resolve()
     return resolve({
@@ -77,7 +83,7 @@ const getAccount = authToken =>
     })
   })
 
-const loadAccountWithAuthToken = (authToken, expireTime) =>
+const loadAuthInfoWithExpire = (authToken, expireTime) =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
@@ -133,7 +139,7 @@ const fetchInvoke = authToken =>
   })
 
 export default {
-  createToken,
+  createAuthInfo,
   getAccount,
   invoke
 }
