@@ -7,6 +7,21 @@ import crypto from 'crypto'
  * @returns {Promise} アカウント情報
  */
 const get = accountId =>
+  new Promise(async (resolve, reject) => {
+    const account = await loadAccountWithAccountId(accountId).catch(err =>
+      reject(err)
+    )
+
+    if (!account) return resolve()
+    return resolve({
+      accountId: account.internalId,
+      emailAddress: account.emailAddress,
+      displayName: account.displayName,
+      scope: account.scope
+    })
+  })
+
+const loadAccountWithAccountId = accountId =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
       if (err) return reject(err)
