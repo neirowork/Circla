@@ -112,7 +112,6 @@ const applyAccountId = (accountNumber, accountId) =>
         },
         err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)

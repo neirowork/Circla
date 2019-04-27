@@ -167,9 +167,8 @@ const vaild = applicationId =>
           sql: "UPDATE applications SET status = 'COMPLETED' WHERE ?",
           values: { applicationId }
         },
-        (err, res) => {
+        err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)
@@ -199,7 +198,6 @@ const loadApplication = applicationId =>
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
           if (!res.length) return resolve(false)
 

@@ -87,7 +87,6 @@ const loadApplications = eventId =>
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(res)

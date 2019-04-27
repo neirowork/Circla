@@ -18,7 +18,7 @@ const get = accountId =>
         (err, res) => {
           con.release()
           if (err) return reject(err)
-          if (!res.length) return resolve(false)
+          if (!res.length) return resolve()
 
           return resolve(res[0])
         }
