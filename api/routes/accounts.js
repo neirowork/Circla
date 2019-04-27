@@ -1,7 +1,8 @@
-require('date-utils')
 import * as express from 'express'
 import { check, validationResult } from 'express-validator/check'
 const router = express.Router()
+
+import consola from 'consola'
 
 import circlaConfig from '../../circla.config'
 

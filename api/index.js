@@ -1,6 +1,8 @@
 import express from 'express'
 const app = express()
 
+import consola from 'consola'
+
 import bodyParser from 'body-parser'
 
 import applicationsRoute from './routes/applications'
@@ -17,6 +19,8 @@ app.use('/events', eventsRoute)
 app.use('/accounts', accountsRoute)
 app.use('/auth', authRoute)
 app.use('/personal-info', personalInfoRoute)
+
+consola.success('APIサーバの準備が整いました！')
 
 export default {
   path: '/api',
