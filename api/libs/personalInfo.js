@@ -17,9 +17,7 @@ const get = accountId =>
         },
         (err, res) => {
           con.release()
-
           if (err) return reject(err)
-
           if (!res.length) return resolve(false)
 
           return resolve(res[0])
@@ -42,9 +40,8 @@ const add = accountId =>
 
       con.query(
         { sql: 'INSERT personalInfos SET ?', values: { accountId } },
-        (err, res) => {
+        err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)
@@ -75,9 +72,8 @@ const update = (accountId, data) =>
             'UPDATE personalInfos SET name = ?, postalCode = ?, address = ? WHERE accountId = ?',
           values: [data.name, data.postalCode, data.address, accountId]
         },
-        (err, res) => {
+        err => {
           con.release()
-
           if (err) return reject(err)
 
           return resolve(true)
