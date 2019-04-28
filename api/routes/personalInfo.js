@@ -9,11 +9,67 @@ import accounts from '../libs/accounts'
 import personalInfos from '../libs/personalInfo'
 
 import errorResponse from '../assets/errors'
+import { resolve } from 'url'
 
 /**
  * ここから下 認証必要ルート
  */
 router.use((req, res, next) => jwtMiddleware(req, res, next))
+
+/**
+ * 🔒(USER) 自分の個人情報を取得
+ * [GET] /personal-info/:accountId
+ */
+router.get('/', async (req, res) => {
+  const personalInfo = await personalInfos
+    .get(req.token.accountId)
+    .catch(err => {
+      if (err.message === 'NOT_FOUND') {
+        res
+          .status(404)
+          .json({ message: '指定されたアカウントのデータが見つかりません。' })
+      } else {
+        res.status(500).json({ message: '内部エラーが発生しました。' })
+      }
+      throw err
+    })
+
+  return res.json({
+    name: personalInfo.name,
+    postalCode: personalInfo.postalCode,
+    address: personalInfo.address
+  })
+})
+
+/**
+ * 🔒(ADMIN) 指定アカウントの個人情報を取得
+ * [GET] /personal-info/:accountId
+ */
+router.get('/:accountId', async (req, res) => {
+  // 管理者以外は通さない
+  if (req.token.scope !== 'ADMIN') {
+    return res.status(403).json(errorResponse.forbidden)
+  }
+
+  const personalInfo = await personalInfos
+    .get(req.params.accountId)
+    .catch(err => {
+      if (err.message === 'NOT_FOUND') {
+        res
+          .status(404)
+          .json({ message: '指定されたアカウントが見つかりません。' })
+      } else {
+        res.status(500).json({ message: '内部エラーが発生しました。' })
+      }
+      throw err
+    })
+
+  return res.json({
+    name: personalInfo.name,
+    postalCode: personalInfo.postalCode,
+    address: personalInfo.address
+  })
+})
 
 /**
  * 🔒(USER) 個人情報の追加

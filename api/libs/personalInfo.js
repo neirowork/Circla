@@ -6,9 +6,25 @@ import db from '../libs/db'
  * @returns {Promise} 個人情報
  */
 const get = accountId =>
+  new Promise(async (resolve, reject) => {
+    const personalInfo = await loadPersonalInfo(accountId).catch(err =>
+      reject(err)
+    )
+
+    if (!personalInfo) return reject(new Error('NOT_FOUND'))
+    return resolve({
+      name: personalInfo.name,
+      postalCode: personalInfo.postalCode,
+      address: personalInfo.address
+    })
+  })
+
+const loadPersonalInfo = accountId =>
   new Promise((resolve, reject) => {
     db.getConnection((err, con) => {
-      if (err) return reject(err)
+      if (err) {
+        return reject(err)
+      }
 
       con.query(
         {
@@ -83,5 +99,6 @@ const update = (accountId, data) =>
   })
 
 export default {
+  get,
   update
 }
