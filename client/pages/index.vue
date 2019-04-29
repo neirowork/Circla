@@ -1,9 +1,18 @@
 <template lang="pug">
-  .container
+  .pageContainer
+    .navbar
+    .container
+      .nuxt
+        | nuxt
+      .side
+        | side
+    .footer
 </template>
 
 <script>
+export default {}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 </style>
+
