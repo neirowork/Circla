@@ -1,6 +1,6 @@
 <template lang="pug">
   .container
-    | index-container
+    | event-_eventId-index-container
 </template>
 
 <script>

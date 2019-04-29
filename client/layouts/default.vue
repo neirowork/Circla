@@ -4,7 +4,7 @@
       | navbar
     .container
       .nuxt
-        | nuxt
+        nuxt
       .side
         | side
     .footer
