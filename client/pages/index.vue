@@ -4,7 +4,18 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      title: this.$title('ホーム')
+    }
+  },
+  head() {
+    return {
+      title: this.title
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
