@@ -1,5 +1,5 @@
 <template lang="pug">
-  navbar.navbar
+  nav.navbar
     .navbar_brand Circla
     ul.navbar_menu
       li.navbar_menu_item ホーム
@@ -13,7 +13,7 @@ export default {}
 .navbar {
   padding: 10px 10%;
   display: block;
-  background-color: rgb(224, 22, 79);
+  background-color: #e0164f;
   color: #ffffff;
 
   &_brand,
