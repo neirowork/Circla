@@ -274,6 +274,7 @@ const getApplication = (accountId, eventId) =>
       applicationId: app.applicationId,
       paymoId: app.paymoId,
       circleName: app.circleName,
+      circleNameKana: app.circleNameKana,
       general: {
         genreCode: app.genreCode,
         overview: app.overview,
