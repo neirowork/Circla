@@ -1,0 +1,37 @@
+.link {
+  color: #e0164f;
+}
+
+.btn {
+  display: inline-block;
+  padding: 5px 15px;
+  font-size: 1.25em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  user-select: none;
+  cursor: pointer;
+
+  transition: all linear 100ms;
+
+  &:not(:first-child) {
+    margin-left: 10px;
+  }
+
+  &:active {
+    box-shadow: none;
+  }
+}
+
+.btn {
+  &-primary {
+    background-color: #e0164f;
+    color: #ffffff;
+  }
+  &-next {
+    background-color: #ff8800;
+    color: #ffffff;
+  }
+  &-back {
+    background-color: #1f4e79;
+    color: #ffffff;
+  }
+}
