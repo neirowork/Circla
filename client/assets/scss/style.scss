@@ -2,6 +2,15 @@
   color: #e0164f;
 }
 
+.alert {
+  margin-bottom: 10px;
+  padding: 10px;
+
+  &-next {
+    background-color: rgba(255, 136, 0, 0.5);
+  }
+}
+
 .btn {
   display: inline-block;
   padding: 5px 15px;
@@ -33,5 +42,61 @@
   &-back {
     background-color: #1f4e79;
     color: #ffffff;
+  }
+}
+
+.form {
+  text-align: center;
+  margin: auto;
+  width: 50%;
+
+  &_control {
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  &_input,
+  &_textarea {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    background-color: #f2f2f2;
+    color: #404040;
+    font-size: 1.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+
+    transition: all linear 100ms;
+
+    &::placeholder {
+      color: #a6a6a6;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    &_label {
+      display: block;
+      text-align: left;
+      color: #404040;
+    }
+
+    &_help {
+      display: block;
+      text-align: left;
+      color: #7f7f7f;
+    }
+  }
+
+  &_input {
+    text-align: center;
+  }
+
+  &_textarea {
+    height: 5em;
+    resize: none;
   }
 }
