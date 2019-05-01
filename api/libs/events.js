@@ -54,6 +54,7 @@ const getApplications = eventId =>
         accountId: app.accountId,
         paymoId: app.paymoId,
         circleName: app.circleName,
+        circleNameKana: app.circleNameKana,
         general: {
           genreCode: app.genreCode,
           overview: app.overview,
