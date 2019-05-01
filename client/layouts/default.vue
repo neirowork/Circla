@@ -24,18 +24,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-</style>
-
-<style lang="scss">
-html,
-body {
-  background-color: rgb(242, 242, 242);
-  margin: 0;
-  padding: 0;
-}
-</style>
-
-<style lang="scss" scoped>
 .navbar {
   margin-bottom: 20px;
 }
