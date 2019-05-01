@@ -83,9 +83,27 @@ router.post(
     check('paymoId')
       .isString()
       .not()
-      .isEmpty(),
+      .isEmpty()
+      .custom(value => {
+        if (!/^U-\d{6}-\d{10}$/.test(value)) {
+          return Promise.reject('無効な支払いID')
+        }
+
+        return Promise.resolve(true)
+      }),
     check('circleName')
       .isString()
+      .not()
+      .isEmpty(),
+    check('circleNameKana')
+      .isString()
+      .custom(value => {
+        if (!/^[ぁ-ん]+$/.test(value)) {
+          return Promise.reject('ひらがな以外が含まれている')
+        }
+
+        return Promise.resolve(true)
+      })
       .not()
       .isEmpty(),
     check('general.genreCode')
@@ -100,7 +118,15 @@ router.post(
       .isInt()
       .not()
       .isEmpty(),
-    check('congruence.paymoId').isString(),
+    check('congruence.paymoId')
+      .isString()
+      .custom(value => {
+        if (value && !/^U-\d{6}-\d{10}$/.test(value)) {
+          return Promise.reject('無効な支払いID')
+        }
+
+        return Promise.resolve(true)
+      }),
     check('congruence.accountId').isString(),
     check('remarks').isString()
   ],
@@ -126,7 +152,12 @@ router.post(
       })
 
     if (application) {
-      return res.status(409).json({ message: '既に申込み済みです。' })
+      return res
+        .status(409)
+        .json({
+          message: '既に申込み済みです。',
+          applicationId: application.applicationId
+        })
     }
 
     const applicationId = await applications
@@ -135,6 +166,7 @@ router.post(
         eventId,
         body.paymoId,
         body.circleName,
+        body.circleNameKana,
         body.general,
         body.congruence,
         body.remarks

@@ -15,6 +15,7 @@ const get = applicationId =>
       accountId: app.accountId,
       paymoId: app.paymoId,
       circleName: app.circleName,
+      circleNameKana: app.circleNameKana,
       general: {
         genreCode: app.genreCode,
         overview: app.overview,
@@ -41,6 +42,7 @@ const get = applicationId =>
  * @param {string} eventId イベントID
  * @param {string} paymoId 支払いID(Paymo)
  * @param {string} circleName サークル名
+ * @param {string} circleNameKana サークル名(ひらがな)
  * @param {object} generalInfos 頒布情報
  * @param {object} congruenceInfos 合体申込み情報
  * @returns {Promise} 申込みID
@@ -50,6 +52,7 @@ const create = (
   eventId,
   paymoId,
   circleName,
+  circleNameKana,
   generalInfos,
   congruenceInfos,
   remarks
@@ -62,6 +65,7 @@ const create = (
       eventId,
       paymoId,
       circleName,
+      circleNameKana,
       generalInfos,
       congruenceInfos,
       remarks,
@@ -86,6 +90,7 @@ const insertApplication = (
   eventId,
   paymoId,
   circleName,
+  circleNameKana,
   generalInfos,
   congruenceInfos,
   remarks,
@@ -103,6 +108,7 @@ const insertApplication = (
             paymoId,
             accountId,
             circleName,
+            circleNameKana,
             genreCode: generalInfos.genreCode,
             overview: generalInfos.overview,
             amount: generalInfos.amount,
