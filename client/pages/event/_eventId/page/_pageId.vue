@@ -1,6 +1,7 @@
 <template lang="pug">
-  .container
-    | event-_eventId-page-_pageId-container
+  section
+    .container
+      | event-_eventId-page-_pageId-container
 </template>
 
 <script>
