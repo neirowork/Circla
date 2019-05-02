@@ -1,7 +1,12 @@
 <template lang="pug">
   section
     .container
-      | event-_eventId-index-container
+      h1.pageHeader イベント名(name)
+
+      .content
+        h2.sectionHeader 開催概要
+          table.overviewTable
+
 </template>
 
 <script>
@@ -20,6 +25,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.pageHeader {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 1.5em;
+  background-color: #e0164f;
+  color: #ffffff;
+}
+
+.sectionHeader {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e0164f;
+  font-size: 1.25em;
 }
 </style>

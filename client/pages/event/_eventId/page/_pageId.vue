@@ -31,7 +31,9 @@ export default {
 .page {
   &_header {
     margin-bottom: 10px;
-    border-bottom: 1px solid #e0164f;
+    padding: 10px;
+    background-color: #e0164f;
+    color: #ffffff;
 
     &_label {
       font-size: 1.5em;
