@@ -36,9 +36,9 @@
         h2.sectionHeader 関連ページ
         .sectionWrap
           .menu
-            .menu_item.menu_item-primary 申込みを行う
-            .menu_item 申込みガイド
-            .menu_item ジャンルコード
+            nuxt-link.menu_item.menu_item-primary(to='/event/myfes2019/application') 申込みを行う
+            nuxt-link.menu_item(to='/event/myfes2019/page/application-guide') 申込みガイド
+            nuxt-link.menu_item(to='/event/myfes2019/page/genre-code') ジャンルコード
 </template>
 
 <script>
@@ -83,16 +83,20 @@ export default {
 .overviewTable {
   width: 100%;
   border-spacing: 2px;
+
   &_row {
   }
+
   &_index,
   &_value {
     padding: 10px;
   }
+
   &_index {
     background-color: #262626;
     color: #ffffff;
   }
+
   &_value {
   }
 }
@@ -103,12 +107,14 @@ export default {
     margin-bottom: 10px;
     padding: 10px;
     background-color: #ffffff;
+    color: #000000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 
     transition: all linear 100ms;
 
     cursor: pointer;
     user-select: none;
+    text-decoration: none;
 
     &-primary {
       background-color: #e0164f;
