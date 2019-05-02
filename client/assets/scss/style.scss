@@ -100,3 +100,23 @@
     resize: none;
   }
 }
+
+.breadcrumbs {
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  background-color: #f7f7f7;
+
+  &_item {
+    display: inline-block;
+    color: #969696;
+
+    &:not(:last-child)::after {
+      padding: 0 5px;
+      content: '>';
+    }
+
+    &:last-child {
+      color: #e0164f;
+    }
+  }
+}
