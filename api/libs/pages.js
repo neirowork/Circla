@@ -38,6 +38,46 @@ const loadPage = (eventId, pageSlug) =>
     })
   })
 
+/**
+ * イベントのページ一覧を取得する
+ * @param {string} eventId
+ */
+const getList = eventId =>
+  new Promise(async (resolve, reject) => {
+    const getList = await loadGetList(eventId).catch(err => reject(err))
+
+    if (getList.length === 0 || getList) return resolve(getList)
+  })
+
+const loadGetList = eventId =>
+  new Promise((resolve, reject) => {
+    db.getConnection((err, con) => {
+      if (err) return reject(err)
+
+      con.query(
+        {
+          sql:
+            'SELECT * FROM pages WHERE id in ( SELECT max(id) FROM pages GROUP BY slug ORDER BY id ) AND eventId = ? ORDER BY id DESC',
+          values: [eventId]
+        },
+        (err, res) => {
+          con.release()
+          if (err) return reject(err)
+
+          return resolve(res)
+        }
+      )
+    })
+  })
+
+/**
+ * ページを更新(リビジョンを作成)
+ * @param {string} eventId
+ * @param {string} pageSlug
+ * @param {string} pageName
+ * @param {string} accountId
+ * @param {string} content
+ */
 const update = (eventId, pageSlug, pageName, accountId, content) =>
   new Promise(async (resolve, reject) => {
     const pageId = await insertPage(
@@ -84,5 +124,6 @@ const insertPage = (eventId, pageSlug, pageName, accountId, content) =>
 
 export default {
   get,
+  getList,
   update
 }

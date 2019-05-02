@@ -8,6 +8,15 @@ import jwtMiddleware from '../middlewares/jwt'
 
 import pages from '../libs/pages'
 
+router.get('/:eventId', async (req, res) => {
+  const pageList = await pages.getList(req.params.eventId).catch(err => {
+    res.status(500).json({ message: '内部エラーが発生しました。' })
+    throw err
+  })
+
+  return res.json(pageList)
+})
+
 router.get('/:eventId/:pageSlug', async (req, res) => {
   const pageData = await pages
     .get(req.params.eventId, req.params.pageSlug)
