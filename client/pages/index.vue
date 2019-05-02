@@ -1,6 +1,7 @@
 <template lang="pug">
-  .container
-    | index-container
+  section
+    .container
+      | index-container
 </template>
 
 <script>
