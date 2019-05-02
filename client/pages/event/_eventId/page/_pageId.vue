@@ -2,9 +2,9 @@
   section
     .breadcrumbs
       .breadcrumbs_item ホーム
-      .breadcrumbs_item TEAMKITTEN OFFLINE COWORKIING 2019
+      .breadcrumbs_item イベント名
       .breadcrumbs_item ページ
-      .breadcrumbs_item 申込みガイド
+      .breadcrumbs_item ページ名
     .page
       .page_header
         h1.page_header_label ページ名(name)
