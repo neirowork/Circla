@@ -33,6 +33,7 @@ router.get('/:eventId/:pageSlug', async (req, res) => {
     name: pageData.name,
     content: pageData.content,
     revision: -1,
+    accountId: pageData.accountId,
     timestamp: pageData.timestamp
   })
 })

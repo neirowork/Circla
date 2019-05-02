@@ -1,112 +1,115 @@
 <template lang="pug">
   .container
     .dialog
-      h1.dialog_header
-        img.dialog_header_icon(src='~/assets/circla-logo.png')
-        .dialog_header_label {{ event.name }} 申込みページ
-      .dialog_main
+      .alert.alert-primary(v-if='!event && error') {{ error.message }}
 
-        .step1(v-if='currentStep === 1')
-          h2.dialog_main_header 申込みの前に
-          p.dialog_main_content
-            | 申込みの前に
-            a.link(href='#') こちらのガイド
-            | をご覧ください。
-            br
-            | このページは、
-            u
-              b {{ event.name }}
-            | の仮申込みページです。
-            br
-            | 本イベントでは、事前に参加費をお支払いしていただく必要がございます。
-            br
-            | 事前に
-            a.link(href='#') こちらのページ
-            | でお支払いを済ませ、「支払いID」をご用意ください。
-            br
-            | ご準備が整いましたら、下の「NEXT」ボタンを押下してください。
-          h2.dialog_main_footer
-            a.btn.btn-primary(@click='currentStep++') NEXT >
+      div(v-if='event')
+        h1.dialog_header
+          img.dialog_header_icon(src='~/assets/circla-logo.png')
+          .dialog_header_label {{ event.name }} 申込みページ
+        .dialog_main
 
-        .step2(v-if='currentStep === 2')
-          h2.dialog_main_header 支払いID
-          p.dialog_main_content
-            | 参加費の支払いIDをご入力ください。
-          .alert.alert-next
-            | 申込み後、事務局が確認しますので、正しいIDをご入力ください。
-          form.form
-            input.form_input(placeHolder='U-190501-0123456789', v-model='application.paymoId')
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
-            
-        .step3(v-if='currentStep === 3')
-          h2.dialog_main_header サークル情報
-          form.form
-            span.form_control
-              label.form_input_label サークル名
-              input.form_input(placeHolder='地下ぐらし！', v-model='application.circleName')
-            span.form_control
-              label.form_input_label さーくるめい(ひらがな)
-              input.form_input(placeHolder='あんだーぐらんどぐらし', v-model='application.circleNameKana')
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
+          .step1(v-if='currentStep === 1')
+            h2.dialog_main_header 申込みの前に
+            p.dialog_main_content
+              | 申込みの前に
+              a.link(:href='`/event/${$route.params.eventId}/page/application-guide`', target='_blank') こちらのガイド
+              | をご覧ください。
+              br
+              | このページは、
+              u
+                b {{ event.name }}
+              | の仮申込みページです。
+              br
+              | 本イベントでは、事前に参加費をお支払いしていただく必要がございます。
+              br
+              | 事前に
+              a.link(href='#') こちらのページ
+              | でお支払いを済ませ、「支払いID」をご用意ください。
+              br
+              | ご準備が整いましたら、下の「NEXT」ボタンを押下してください。
+            h2.dialog_main_footer
+              a.btn.btn-primary(@click='currentStep++') NEXT >
 
-        .step4(v-if='currentStep === 4')
-          h2.dialog_main_header 頒布情報
-          form.form
-            span.form_control
-              label.form_input_label ジャンルコード
-              input.form_input(placeHolder='300', v-model='application.general.genreCode')
-              span.form_input_help
-                | ジャンルコードは
-                a.link(href='#') こちら
-                | をご覧ください
-            span.form_control
-              label.form_input_label 頒布物概要
-              textarea.form_textarea(v-model='application.general.overview')
-              span.form_input_help サークル配置を検討する際に必要な情報ですので、簡潔かつ明確にお願い致します。
-            span.form_control
-              label.form_input_label 頒布予定数(単位なし)
-              input.form_input(placeHolder='50', v-model='application.general.amount')
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
+          .step2(v-if='currentStep === 2')
+            h2.dialog_main_header 支払いID
+            p.dialog_main_content
+              | 参加費の支払いIDをご入力ください。
+            .alert.alert-next
+              | 申込み後、事務局が確認しますので、正しいIDをご入力ください。
+            form.form
+              input.form_input(placeHolder='U-190501-0123456789', v-model='application.paymoId')
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='next(application.paymoId)') NEXT >
+              
+          .step3(v-if='currentStep === 3')
+            h2.dialog_main_header サークル情報
+            form.form
+              span.form_control
+                label.form_input_label サークル名
+                input.form_input(placeHolder='地下ぐらし！', v-model='application.circleName', required)
+              span.form_control
+                label.form_input_label さーくるめい(ひらがな)
+                input.form_input(placeHolder='あんだーぐらんどぐらし', v-model='application.circleNameKana', required)
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='next(application.circleName, application.circleNameKana)') NEXT >
 
-        .step5(v-if='currentStep === 5')
-          h2.dialog_main_header 合体申込み情報
-          p.dialog_main_content
-            | 合体申込みについては、こちらのガイドをご覧ください。
-            br
-            | 合体申込みをする必要のない方は、そのまま「NEXT」を押下してください。
-          form.form
-            span.form_control
-              label.form_input_label 相手サークル アカウントID
-              input.form_input(placeHolder='ae41e4649b934ca495991b7852b855', v-model='application.congruence.paymoId')
-            span.form_control
-              label.form_input_label 相手サークル 支払いID
-              input.form_input(placeHolder='U-190501-0123456789', v-model='application.congruence.accountId')
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
+          .step4(v-if='currentStep === 4')
+            h2.dialog_main_header 頒布情報
+            form.form
+              span.form_control
+                label.form_input_label ジャンルコード
+                input.form_input(type='number', placeHolder='300', v-model='application.general.genreCode')
+                span.form_input_help
+                  | ジャンルコードは
+                  a.link(:href='`/event/${$route.params.eventId}/page/genre-code`', target='_blank') こちら
+                  | をご覧ください
+              span.form_control
+                label.form_input_label 頒布物概要
+                textarea.form_textarea(v-model='application.general.overview')
+                span.form_input_help サークル配置を検討する際に必要な情報ですので、簡潔かつ明確にお願い致します。
+              span.form_control
+                label.form_input_label 頒布予定数(単位なし)
+                input.form_input(type='number', placeHolder='50', v-model='application.general.amount')
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='next(application.general.genreCode, application.general.overview, application.general.amount)') NEXT >
 
-        .step6(v-if='currentStep === 6')
-          h2.dialog_main_header 事務局使用欄
-          p.dialog_main_content
-            | 事務局から指示された場合に入力してください。
-          form.form
-            span.form_control
-              label.form_input_label 備考
-              input.form_input(v-model='application.remarks')
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
+          .step5(v-if='currentStep === 5')
+            h2.dialog_main_header 合体申込み情報
+            p.dialog_main_content
+              | 合体申込みについては、こちらのガイドをご覧ください。
+              br
+              | 合体申込みをする必要のない方は、そのまま「NEXT」を押下してください。
+            form.form
+              span.form_control
+                label.form_input_label 相手サークル アカウントID
+                input.form_input(placeHolder='ae41e4649b934ca495991b7852b855', v-model='application.congruence.paymoId')
+              span.form_control
+                label.form_input_label 相手サークル 支払いID
+                input.form_input(placeHolder='U-190501-0123456789', v-model='application.congruence.accountId')
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='currentStep++') NEXT >
 
-        .step7(v-if='currentStep === 7')
-          h2.dialog_main_header 入力内容確認
-          p.dialog_main_content
-            | 不備がないか、もう一度ご確認ください。
+          .step6(v-if='currentStep === 6')
+            h2.dialog_main_header 事務局使用欄
+            p.dialog_main_content
+              | 事務局から指示された場合に入力してください。
+            form.form
+              span.form_control
+                label.form_input_label 備考
+                input.form_input(v-model='application.remarks')
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='currentStep++') NEXT >
+
+          .step7(v-if='currentStep === 7')
+            h2.dialog_main_header 入力内容確認
+            p.dialog_main_content
+              | 不備がないか、もう一度ご確認ください。
             table.checkTable
               tr.checkTable_row
                 td.checkTable_row_section
@@ -145,21 +148,21 @@
                 td.checkTable_row_index 備考
                 td.checkTable_row_value {{ application.remarks }}
 
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-next(@click='currentStep++') NEXT >
-            
-        .step8(v-if='currentStep === 8')
-          h2.dialog_main_header 申込み最終確認ページ
-          p.dialog_main_content
-            | 以上で完了です。
-            br
-            | 「PRE-APPLICATION」を押下し、仮申込みを確定してください。
-          h2.dialog_main_footer
-            a.btn.btn-back(@click='currentStep--') < BACK
-            a.btn.btn-primary(@click='pushApplication()') PRE-APPLICATION >
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-next(@click='currentStep++') NEXT >
+              
+          .step8(v-if='currentStep === 8')
+            h2.dialog_main_header 申込み最終確認ページ
+            p.dialog_main_content
+              | 以上で完了です。
+              br
+              | 「PRE-APPLICATION」を押下し、仮申込みを確定してください。
+            h2.dialog_main_footer
+              a.btn.btn-back(@click='currentStep--') < BACK
+              a.btn.btn-primary(@click='pushApplication()') PRE-APPLICATION >
 
-      .dialog_footer Step {{ currentStep }} / 8
+        .dialog_footer Step {{ currentStep }} / 8
     .modalWrap(v-if='this.showModal')
       .modalWrap_modal
         .modalWrap_modal_header 仮申込みが完了しました。
@@ -168,19 +171,20 @@
           br
           | 申込みが有効になると、メールにて通知されます。
         .modalWrap_modal_footer
-          a.btn.btn-back(@click="$router.push('/event/myfes2019')") イベントページへ戻る
+          a.btn.btn-back(@click="$router.push(`/event/${$route.params.eventId}`)") イベントページへ戻る
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   layout: 'application',
   data() {
     return {
-      title: this.$title('申込み - イベント名'),
-      currentStep: 1,
-      event: {
-        name: 'マイフェス2019 同人即売会'
-      },
+      initialized: false,
+      title: this.$title('申込み - event'),
+      error: null,
+      event: null,
       application: {
         paymoId: '',
         circleName: '',
@@ -196,6 +200,7 @@ export default {
         },
         remarks: ''
       },
+      currentStep: 1,
       showModal: false
     }
   },
@@ -208,6 +213,30 @@ export default {
     pushApplication() {
       console.log(this.application)
       this.showModal = true
+    },
+    next() {
+      let ok = true
+      for (let i = 0; i < arguments.length; i++) {
+        ok = ok && arguments[i]
+      }
+      if (ok) this.currentStep++
+    }
+  },
+  async beforeMount() {
+    this.initialized = true
+
+    try {
+      const event = await axios.get(`/api/events/${this.$route.params.eventId}`)
+      this.event = event.data
+      this.title = this.$title(`申込み - ${event.data.name}`)
+    } catch (e) {
+      const status = e.response.status
+      if (status === 404) {
+        this.error = { message: 'イベントが見つかりません。' }
+      } else {
+        this.error = { message: `内部エラーが発生しました。(${status})` }
+        console.error(e)
+      }
     }
   }
 }
@@ -252,6 +281,10 @@ export default {
     &_header {
       text-align: center;
       font-size: 1.75em;
+    }
+
+    &_content {
+      margin-bottom: 10px;
     }
 
     &_footer {

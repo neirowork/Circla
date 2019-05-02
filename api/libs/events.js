@@ -10,9 +10,9 @@ const get = eventId =>
     if (eventId !== 'myfes2019') return reject(new Error('NOT_FOUND'))
 
     return resolve({
-      name: 'マイフェス2019 ~Block Harmony.',
+      name: 'マイフェス2019 同人即売会',
       url: 'https://myfes.biblio-packers.net',
-      twitter: '@MyFes2019',
+      twitter: 'MyFes2019',
       startAt: '1574559000',
       place: {
         name: '大田区産業プラザPiO 大展示ホール',
@@ -31,7 +31,7 @@ const get = eventId =>
         {
           name: '1スペース',
           fee: '4000',
-          remarks: '(机半分90cm x 45cm・椅子2脚・サークル通行証2枚'
+          remarks: '机半分90cm x 45cm・椅子2脚・サークル通行証2枚'
         }
       ]
     })

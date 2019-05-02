@@ -1,27 +1,59 @@
 <template lang="pug">
   section
-    .breadcrumbs
-      .breadcrumbs_item ホーム
-      .breadcrumbs_item イベント名
-      .breadcrumbs_item ページ
-      .breadcrumbs_item ページ名
-    .page
-      .page_header
-        h1.page_header_label ページ名(name)
-        .page_header_info 最終更新日 : 2019年5月2日 13時52分(timestamp) / 更新ユーザ : 染宮ねいろ(accountId)
-      .page_content これはページ内容です(content)
+    .alert.alert-primary(v-if='!(page && event) && error') {{ error.message }}
+
+    div(v-if='event && page')
+      .breadcrumbs
+        nuxt-link.breadcrumbs_item(to='/') ホーム
+        nuxt-link.breadcrumbs_item(:to='`/event/${$route.params.eventId}`') {{ event.name }}
+        .breadcrumbs_item ページ
+        .breadcrumbs_item {{ page.name }}
+      .page
+        .page_header
+          h1.page_header_label {{ page.name }}
+          .page_header_info 最終更新日 : {{ page.timestamp }} / 更新ユーザ : {{ page.accountId }}
+        .page_content {{ page.content }}
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   data() {
     return {
-      title: this.$title('ページ名 - イベント名')
+      initialized: false,
+      title: this.$title('page - event'),
+      error: null,
+      event: null,
+      page: null
     }
   },
   head() {
     return {
       title: this.title
+    }
+  },
+  async beforeMount() {
+    this.initialized = true
+
+    try {
+      const event = await axios.get(`/api/events/${this.$route.params.eventId}`)
+      this.event = event.data
+
+      const page = await axios.get(
+        `/api/pages/${this.$route.params.eventId}/${this.$route.params.pageId}`
+      )
+      this.page = page.data
+      this.title = this.$title(`${page.data.name} - ${event.data.name}`)
+      console.log(page.data)
+    } catch (e) {
+      const status = e.response.status
+      if (status === 404) {
+        this.error = { message: 'ページが見つかりません。' }
+      } else {
+        this.error = { message: `内部エラーが発生しました。(${status})` }
+        console.error(e)
+      }
     }
   }
 }
@@ -44,6 +76,10 @@ export default {
       padding-left: 2em;
       font-size: 0.8em;
     }
+  }
+
+  &_content {
+    padding: 0 10px;
   }
 }
 </style>
