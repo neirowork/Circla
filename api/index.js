@@ -11,6 +11,7 @@ import eventsRoute from './routes/events'
 import accountsRoute from './routes/accounts'
 import authRoute from './routes/auth'
 import personalInfoRoute from './routes/personalInfo'
+import pagesRoute from './routes/pages'
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -21,6 +22,7 @@ app.use('/events', eventsRoute)
 app.use('/accounts', accountsRoute)
 app.use('/auth', authRoute)
 app.use('/personal-info', personalInfoRoute)
+app.use('/pages', pagesRoute)
 
 consola.success('APIサーバの準備が整いました！')
 
