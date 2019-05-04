@@ -38,3 +38,40 @@ body,
   width: 100%;
   height: 100%;
 }
+
+.rawHTML {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 5px;
+  }
+
+  h2 {
+    padding: 0 10px;
+    font-size: 1.75em;
+    border-left: 10px solid #e0164f;
+    border-bottom: 2px solid #e0164f;
+  }
+
+  h3 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #e0164f;
+  }
+
+  ul,
+  ol {
+    padding-left: 2em;
+
+    li {
+      line-height: 1.75em;
+    }
+  }
+
+  p {
+    padding: 0 10px;
+    margin-bottom: 10px;
+  }
+}
