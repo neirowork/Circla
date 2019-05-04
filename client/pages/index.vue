@@ -7,7 +7,7 @@
       h1.pageHeader 申込み受付中のイベント
 
       .menu
-        .menu_item
+        nuxt-link.menu_item(to='/event/myfes2019')
           .menu_item_eyecatch(:style="`background-image: url(${require('../assets/myfes.jpg')})`")
           .menu_item_content
             .menu_item_content_label
@@ -38,7 +38,10 @@ export default {
 
 .menu {
   &_item {
+    display: block;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+    color: #000000;
 
     &_eyecatch {
       background-position: center center;

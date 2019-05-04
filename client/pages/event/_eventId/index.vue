@@ -4,7 +4,7 @@
 
     div(v-if='event')
       .breadcrumbs
-        .breadcrumbs_item ホーム
+        nuxt-link.breadcrumbs_item(to='/') ホーム
         .breadcrumbs_item {{ event.name }}
 
       .container
