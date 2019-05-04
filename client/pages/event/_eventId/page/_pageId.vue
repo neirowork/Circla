@@ -11,8 +11,8 @@
       .page
         .page_header
           h1.page_header_label {{ page.name }}
-          .page_header_info 最終更新日 : {{ page.timestamp }} / 更新ユーザ : {{ page.accountId }}
-        .page_content {{ page.content }}
+          .page_header_info 最終更新日 : {{ page.timestamp }}
+        .page_content.rawHTML(v-html='page.content')
 </template>
 
 <script>
