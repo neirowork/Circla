@@ -29,7 +29,8 @@
               br
               | ご準備が整いましたら、下の「NEXT」ボタンを押下してください。
             h2.dialog_main_footer
-              a.btn.btn-primary(@click='currentStep++') NEXT >
+              nuxt-link.btn.btn-back(:to='`/event/${$route.params.eventId}`') < BACK
+              button.btn.btn-primary(@click='currentStep++') NEXT >
 
           .step2(v-if='currentStep === 2')
             h2.dialog_main_header 支払いID
@@ -40,8 +41,8 @@
             form.form
               input.form_input(placeHolder='U-190501-0123456789', v-model='application.paymoId')
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='next(application.paymoId)') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='next(application.paymoId)') NEXT >
               
           .step3(v-if='currentStep === 3')
             h2.dialog_main_header サークル情報
@@ -53,8 +54,8 @@
                 label.form_input_label さーくるめい(ひらがな)
                 input.form_input(placeHolder='あんだーぐらんどぐらし', v-model='application.circleNameKana', required)
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='next(application.circleName, application.circleNameKana)') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='next(application.circleName, application.circleNameKana)') NEXT >
 
           .step4(v-if='currentStep === 4')
             h2.dialog_main_header 頒布情報
@@ -74,8 +75,8 @@
                 label.form_input_label 頒布予定数(単位なし)
                 input.form_input(type='number', placeHolder='50', v-model='application.general.amount')
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='next(application.general.genreCode, application.general.overview, application.general.amount)') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='next(application.general.genreCode, application.general.overview, application.general.amount)') NEXT >
 
           .step5(v-if='currentStep === 5')
             h2.dialog_main_header 合体申込み情報
@@ -91,8 +92,8 @@
                 label.form_input_label 相手サークル 支払いID
                 input.form_input(placeHolder='U-190501-0123456789', v-model='application.congruence.accountId')
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='currentStep++') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='currentStep++') NEXT >
 
           .step6(v-if='currentStep === 6')
             h2.dialog_main_header 事務局使用欄
@@ -103,8 +104,8 @@
                 label.form_input_label 備考
                 input.form_input(v-model='application.remarks')
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='currentStep++') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='currentStep++') NEXT >
 
           .step7(v-if='currentStep === 7')
             h2.dialog_main_header 入力内容確認
@@ -149,8 +150,8 @@
                 td.checkTable_row_value {{ application.remarks }}
 
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-next(@click='currentStep++') NEXT >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-next(@click='currentStep++') NEXT >
               
           .step8(v-if='currentStep === 8')
             h2.dialog_main_header 申込み最終確認ページ
@@ -159,8 +160,8 @@
               br
               | 「PRE-APPLICATION」を押下し、仮申込みを確定してください。
             h2.dialog_main_footer
-              a.btn.btn-back(@click='currentStep--') < BACK
-              a.btn.btn-primary(@click='pushApplication()') PRE-APPLICATION >
+              button.btn.btn-back(@click='currentStep--') < BACK
+              button.btn.btn-primary(@click='pushApplication()') PRE-APPLICATION >
 
         .dialog_footer Step {{ currentStep }} / 8
     .modalWrap(v-if='this.showModal')
@@ -171,7 +172,7 @@
           br
           | 申込みが有効になると、メールにて通知されます。
         .modalWrap_modal_footer
-          a.btn.btn-back(@click="$router.push(`/event/${$route.params.eventId}`)") イベントページへ戻る
+          button.btn.btn-back(@click="$router.push(`/event/${$route.params.eventId}`)") イベントページへ戻る
 </template>
 
 <script>
