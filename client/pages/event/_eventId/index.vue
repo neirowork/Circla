@@ -95,25 +95,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.pageHeader {
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1.5em;
-  background-color: #e0164f;
-  color: #ffffff;
-}
-
-.sectionHeader {
-  margin-bottom: 10px;
-  border-bottom: 1px solid #e0164f;
-  font-size: 1.25em;
-}
-
-.sectionWrap {
-  margin-bottom: 10px;
-  padding: 0 10px;
-}
-
 .content {
   padding: 0 10px;
 }
