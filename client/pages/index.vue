@@ -33,9 +33,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
-}
-
 .menu {
   &_item {
     display: block;
